@@ -1,0 +1,1075 @@
+/* Import Inter from Google Fonts */
+/* @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+:root {
+  --slider-start: #DDDDDD;
+  --slider-mid: #DDDDDD;
+  --slider-end: #785ef0;
+  --deactivated-color: #888888;
+}
+
+/* Apply Inter to all jsPsych content */
+.jspsych-display-element,
+.jspsych-btn,
+.jspsych-html-keyboard-response-stimulus,
+.jspsych-html-button-response-stimulus {
+  font-family: "Inter Tight", sans-serif !important;
+}
+
+h2 {
+  text-align: center;
+  font-size: 16pt;
+  font-weight: 800;
+}
+
+h3 {
+  text-align: left;
+  font-size: 12pt;
+  font-weight: 500;
+  margin: 0;
+}
+
+p {
+  font-size: 12pt;
+  text-align: center;
+  margin-top: 0;
+}
+
+p.align-left {
+  text-align: left;
+  margin-bottom: 0;
+  &.indented {
+    margin-left: 1em;
+  }
+}
+
+ul {
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+}
+
+ul li {
+  font-size: 12pt;
+  text-align: left;
+}
+
+
+a {
+  color: gray;
+  text-decoration: none;
+  font-size: 10pt;
+  padding: 2px 5px 2px;
+  border-radius: 5px;
+  background: #EEEEEE;
+  &:hover {
+    background-color: #DDDDDD;
+    color: black;
+  }
+}
+
+/* FULLSCREEN PLUGIN */
+.jspsych-content {
+  box-sizing: border-box;
+  margin: auto;
+  padding: 2em 10em;
+  /* background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px; */
+  /* display: flex;
+  flex-direction: column;
+  justify-content: center; */
+  /* align-items: center; */
+  text-align: center;
+  min-height: 100vh;
+  min-width: 50em;
+  max-width: 65em;
+  line-height: 1.5;
+}
+
+
+.quote {
+  margin-top: 50px; 
+  padding: 20px; 
+  background-color: #eee; 
+  border: black 2px solid; 
+  border-radius: 5px;
+}
+
+.grid-container-wrapper {
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  margin: 50px 0 100px 0; 
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(50px, auto);
+  gap: 50px;
+}
+
+#trial-format {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-auto-rows: minmax(250px, auto);
+  gap: 50px;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+}
+
+
+.fade-in {
+  opacity: 0; /* Start with 0 opacity */
+  animation: fadeInAnimation 1s forwards; /* Animation name and duration */
+}
+
+@keyframes fadeInAnimation {
+  0% { opacity: 0; } /* Start with 0 opacity */
+  100% { opacity: 1; } /* End with 1 opacity */
+}
+
+.fade-out {
+  opacity: 1; /* Start with full opacity */
+  animation: fadeOutAnimation 1s forwards; /* Animation name and duration */
+}
+
+@keyframes fadeOutAnimation {
+  0% { opacity: 1; } /* Start with full opacity */
+  100% { opacity: 0; } /* End with 0 opacity */
+}
+
+.fade-out-partial {
+  opacity: 1; /* Start with full opacity */
+  animation: fadeOutAnimationPartial 1s forwards; /* Animation name and duration */
+}
+
+@keyframes fadeOutAnimationPartial {
+  0% { opacity: 1; } /* Start with full opacity */
+  100% { opacity: 0.3; } /* End with 0 opacity */
+}
+
+
+/* Multiple Choice */
+.jspsych-survey-multi-choice-preamble {
+  text-align: left; 
+  font-size: 14pt;
+}
+
+.jspsych-survey-multi-choice-question {
+  text-align: left; 
+  font-size: 12pt;
+}
+
+
+blockquote {
+  text-align: left;
+  font-size: 12pt;
+  font-style: italic;
+  border-left: 5px solid #ccc;
+  margin: 1.5em 10px;
+  padding: 0.5em 10px;
+}
+
+
+.jspsych-survey-multi-choice-hint {
+  font-size: 10pt;
+  text-align: left; 
+  line-height: 1.5em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-shadow: 4px 4px 4px #ccc;
+  padding: 10px;
+  margin-top: 15px;
+}
+
+@-webkit-keyframes bounceLeft {
+  0%,
+  25%,
+  50%,
+  75%,
+  100% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+  12.5%,
+  37.5% {
+    -webkit-transform: translateX(-10px);
+    transform: translateX(-10px);
+  }
+  62.5% {
+    -webkit-transform: translateX(-5px);
+    transform: translateX(-5px);
+  }
+}
+@-moz-keyframes bounceLeft {
+  0%,
+  25%,
+  50%,
+  75%,
+  100% {
+    transform: translateX(0);
+  }
+  12.5%,
+  37.5% {
+    transform: translateX(-10px);
+  }
+  62.5% {
+    transform: translateX(-5px);
+  }
+}
+@keyframes bounceLeft {
+  0%,
+  25%,
+  50%,
+  75%,
+  100% {
+    -ms-transform: translateX(0);
+    transform: translateX(0);
+  }
+  12.5%,
+  37.5% {
+    -ms-transform: translateX(-10px);
+    transform: translateX(-10px);
+  }
+  62.5% {
+    -ms-transform: translateX(-5px);
+    transform: translateX(-5px);
+  }
+}
+
+@-webkit-keyframes bounceRight {
+  0%, 25%, 50%, 75%, 100% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+  12.5%, 37.5% {
+    -webkit-transform: translateX(10px);
+    transform: translateX(10px);
+  }
+  62.5% {
+    -webkit-transform: translateX(5px);
+    transform: translateX(5px);
+  }
+}
+
+@-moz-keyframes bounceRight {
+  0%, 25%, 50%, 75%, 100% {
+    transform: translateX(0);
+  }
+  12.5%, 37.5% {
+    transform: translateX(10px);
+  }
+  62.5% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes bounceRight {
+  0%, 25%, 50%, 75%, 100% {
+    -ms-transform: translateX(0);
+    transform: translateX(0);
+  }
+  12.5%, 37.5% {
+    -ms-transform: translateX(10px);
+    transform: translateX(10px);
+  }
+  62.5% {
+    -ms-transform: translateX(5px);
+    transform: translateX(5px);
+  }
+}
+
+
+#fa-arrow-left {
+  -webkit-animation: bounceLeft 2s infinite;
+  animation: bounceLeft 2s infinite;
+}
+
+#fa-arrow-right {
+  -webkit-animation: bounceRight 2s infinite;
+  animation: bounceRight 2s infinite;
+}
+
+
+
+#jspsych-confirm-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 10000;
+  opacity: 1;
+}
+
+
+#jspsych-confirm-popup p {
+  margin-bottom: 20px;
+}
+
+#jspsych-confirm-popup button {
+  margin-right: 10px;
+}
+
+#jspsych-survey-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Adjust the alpha value to control the opacity */
+  z-index: 9999; /* Ensure the overlay appears on top of other elements */
+  display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* --- Background Content Styling --- */
+
+/* Define the entrance animation */
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(50px); /* Starts 50px below its final position */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- NEW: Wrapper for absolute positioning --- */
+#aat-experiment-wrapper {
+  position: relative;
+  /* Define size based on the card size */
+  width: 500px;
+}
+
+/* --- UPDATED: Card Stacking and Initial State --- */
+.norming-card {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(0%);
+  overflow: hidden;
+  border-radius: 10px;
+  border: rgba(0, 0, 0, 0.1) 2px solid;
+  margin-bottom: 20px;
+  padding: 25px;
+  width: 500px;
+}
+
+.norming-card-moral {
+  box-shadow: 0px 0px 12px rgb(13, 110, 237);
+}
+
+.norming-card-immoral {
+  box-shadow: 0px 0px 12px rgb(224, 18, 18);
+}
+
+.aat-parent-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  transform: translateY(0%);
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: rgba(0, 0, 0, 0.1) 2px solid;
+
+  /* STACKING: All cards are absolutely positioned */
+  position: absolute; 
+  top: 50%;
+  left: 0;
+  
+  /* HIDE ALL CARDS BY DEFAULT */
+  opacity: 0; 
+  pointer-events: none; /* Make hidden cards unclickable */
+  
+  /* Animation preparation */
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; 
+}
+
+/* --- NEW: Class for the current, visible card --- */
+.aat-parent-container.active {
+  opacity: 1;
+  pointer-events: auto; /* Make the active card clickable */
+  z-index: 100; /* Bring it to the top */
+  /* Entrance animation is handled by JS transition, but you can add a slight initial visual effect */
+  transform: scale(1);
+}
+
+/* --- NEW: Exit Animation for the "completed" card --- */
+.aat-parent-container.exit {
+  opacity: 0;
+  pointer-events: none;
+  /* Exit effect: slide off the screen */
+  transform: translateX(550px) rotate(5deg); /* Slides out to the right */
+  transition: transform 0.4s ease-in, opacity 0.4s ease-in;
+}
+
+.aat-parent-container.no {
+  opacity: 0;
+  pointer-events: none;
+  /* Exit effect: slide off the screen */
+  transform: translateX(-550px) rotate(-5deg); /* Slides out to the left */
+  transition: transform 0.4s ease-in, opacity 0.4s ease-in;
+}
+
+/* --- NEW: Entrance Animation for the "next" card --- */
+/* This happens when the card becomes .active */
+.aat-parent-container.next-in {
+  /* Initial state just before it becomes 'active' */
+  opacity: 0;
+  z-index: 99;
+  transform: scale(0.95) translateY(10px); /* Slightly smaller/lower, like it's in the deck */
+}
+
+
+
+
+
+
+.aat-stimulus-container {
+  display: flex;
+  flex-direction: column;
+  padding: 50px;
+}
+
+.aat-button-container {
+  padding-top: 25px;
+  padding-bottom: 25px;
+  border-top: 1px #D0D3D7 solid;
+  display: flex;
+  justify-content: space-evenly;
+  width: 400px;
+  height: 50px;
+}
+
+/* 1. Define the animation */
+@keyframes pop-up {
+  0% {
+    transform: scale(0.9); /* Slightly smaller */
+    opacity: 1;
+  }
+  80% {
+    transform: scale(1.05); /* Overshoot slightly */
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1); /* Back to normal size */
+    opacity: 1;
+  }
+}
+
+.aat-button {
+  --btn-color: #888; /* fallback */
+
+  font-weight: 600;
+  flex-grow: 1;
+  margin: 0 25px;
+  padding: 15px 30px;
+  font-size: 16px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 15px;
+  color: white;
+  cursor: pointer;
+
+  background-color: var(--btn-color);
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    animation: pop-up 0.3s ease forwards;
+    box-shadow: 0 0.25em 0.25em -0.1em var(--btn-color);
+    transform: translateY(-0.25em);
+    border-color: var(--btn-color);
+  }
+}
+
+.aat-button-yes {
+  --btn-color: #28a745; /* Green */
+}
+
+.aat-button-no {
+  --btn-color: #dc3545; /* Red */
+}
+
+/* .aat-button.front {
+    display: block;
+    padding: 12px 42px;
+    border-radius: 12px;
+    font-size: 1.25rem;
+    background: transform;
+    color: white;
+    transform: translateY(-6px);
+} */
+
+.faded-text {
+  /* Apply a gradient mask to fade out the bottom */
+  padding: 0 20px 0;
+    -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 5%,
+    black 15%,              /* readable zone */
+    rgba(0,0,0,0.15) 40%,   /* steep drop */
+    rgba(0,0,0,0.05) 95%  /* almost invisible, but present */
+  );
+
+  mask-image: linear-gradient(
+    to bottom,
+    black 5%,
+    black 15%,
+    rgba(0,0,0,0.15) 40%,
+    rgba(0,0,0,0.05) 95%
+  );
+  filter: blur(2px);
+}
+
+
+
+
+.jspsych-survey-html-form {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 48px;
+  max-width: 50em !important;
+}
+
+.jspsych-survey-html-form-question-rich {
+  border-radius: 10px;
+  border: 1px solid #DDD;
+  background-color: #F9F9F9;
+  box-shadow: 2px 2px 5px #DDD;
+  padding: 20px;
+}
+
+.jspsych-survey-html-form-question-minimal {
+  border-radius: 10px;
+  border: none;
+}
+
+
+.jspsych-survey-html-form-prompt {
+  text-align: left;
+  display: block;
+  margin-bottom: 12px;
+  font-size: 12pt;
+}
+
+.jspsych-survey-html-form-preamble {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+/* Write-in Options */ 
+.jspsych-survey-html-form-writein-container {
+  display: block;
+}
+
+.jspsych-survey-html-form-writein {
+  padding: 1px 4px 1px;
+  font-size: 10pt !important;
+  width: 100px;
+  box-sizing: border-box;
+  font-family: 'Geist', sans-serif !important;
+}
+
+textarea {
+  padding: 8px;
+  font-size: 12pt !important;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 5px;
+  font-family: 'Inter Tight', sans-serif !important;
+}
+
+/* Slider Options */
+input[type="range"] {
+    margin: 0;
+}
+
+/* Number Options */
+input[type="number"] {
+  font-size: 10pt;
+  padding: 5px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.jspsych-survey-html-form-options-container-vertical {
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: .625rem;
+  max-width: fit-content;
+}
+
+.jspsych-survey-html-form-options-container-horizontal {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .625rem;
+}
+
+@media (min-width: 30rem) {
+  .jspsych-survey-html-form-options-container-horizontal {
+    grid-template-columns: repeat(var(--option-count), 1fr);
+    width: 100%;
+  }
+}
+
+.jspsych-survey-html-form-radio-option-vertical,
+.jspsych-survey-html-form-checkbox-option-vertical {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  padding: 8px 16px 8px 8px;
+  gap: 10px;
+  font-size: 10pt;
+  color: #333;
+  cursor: pointer;
+  box-sizing: border-box !important;
+  border: 2.5px solid transparent;
+  &:hover{
+    background-color: #EEF5FC;
+  }
+  &:focus-within {
+    border: 2.5px solid #0070e0;
+  }
+}
+
+.comprehension-check-fail > div > label.selected{
+  background-color: #fcf5f6;
+  &:focus-within {
+    border: 2.5px solid #BB0000;
+  }
+}
+
+.comprehension-check-success > div > label.selected{
+  background-color: #f1f9f5;
+  &:focus-within {
+    border: 2.5px solid #107e3e;
+  }
+}
+
+.comprehension-check-fail > div > label.selected > span.radio-button, 
+.comprehension-check-fail > div > label.selected > span.checkbox-button {
+  border-color: #BB0000;
+  background-color: #BB0000;
+}
+
+.comprehension-check-success > div > label.selected > span.radio-button, 
+.comprehension-check-success > div > label.selected > span.checkbox-button {
+  border-color: #107e3e;
+  background-color: #107e3e;
+}
+
+.jspsych-survey-html-form-radio-option-horizontal,
+.jspsych-survey-html-form-checkbox-option-horizontal {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 10pt;
+  color: #333;
+  cursor: pointer;
+  box-sizing: border-box !important;
+  border: 2.5px solid transparent;
+  &:hover{
+    background-color: #EEF5FC;
+  }
+  &:focus-within {
+    border: 2.5px solid #0070e0;
+  }
+}
+
+/* Multiple Choice Options */
+input[type="radio" i],
+input[type="checkbox" i] {
+  align-self: center;
+  flex-shrink: 0;
+  height: 1rem;
+  width: 1rem;
+  opacity: 0;
+  position: absolute;
+  visibility: visible !important;
+  cursor: pointer;
+}
+
+
+.radio-button,
+.checkbox-button {
+  align-self: center;
+  flex-shrink: 0;
+  border: .125rem solid #777d85;
+  height: 1.25rem;
+  width: 1.25rem;
+  pointer-events: none;
+}
+
+.radio-button {
+  border-radius: 50%;
+}
+
+.checkbox-button {
+  border-radius: 10%;
+}
+
+.radio-button-label-vertical,
+.checkbox-button-label-vertical {
+  text-align: left;
+}
+
+.radio-button-label-horizontal,
+.checkbox-button-label-horizontal {
+  text-align: center;
+}
+
+/* 2. Style the SVG container (initially hidden) */
+.checkmark-svg, .x-svg {
+  stroke: #fff;
+  stroke-width: .125rem;
+  display: none;
+  pointer-events: none;
+}
+
+.checkmark-svg svg {
+  display: flex;
+  height: 105%;
+  width: 105%;
+}
+
+/* 3. Style when the parent label is 'selected' (after click) */
+.jspsych-survey-html-form-radio-option-horizontal.selected,
+.jspsych-survey-html-form-radio-option-vertical.selected,
+label.jspsych-survey-html-form-checkbox-option-horizontal.selected,
+label.jspsych-survey-html-form-checkbox-option-vertical.selected {
+  background-color: #DEECF9; /* Light blue background */
+}
+
+.jspsych-survey-html-form-radio-option-horizontal.selected .radio-button,
+.jspsych-survey-html-form-radio-option-vertical.selected .radio-button,
+.jspsych-survey-html-form-checkbox-option-horizontal.selected .checkbox-button,
+.jspsych-survey-html-form-checkbox-option-vertical.selected .checkbox-button {
+  border-color: #0070e0; /* Blue border */
+  background-color: #0070e0; /* Blue background */
+}
+
+/* 4. Show the checkmark and make its path white when selected */
+.jspsych-survey-html-form-radio-option-horizontal.selected .checkmark-svg,
+.jspsych-survey-html-form-radio-option-vertical.selected .checkmark-svg,
+.jspsych-survey-html-form-checkbox-option-horizontal.selected .checkmark-svg,
+.jspsych-survey-html-form-checkbox-option-vertical.selected .checkmark-svg {
+    display: block; /* Show the SVG */
+}
+
+.jspsych-survey-html-form-radio-option-horizontal.selected .checkmark-svg svg path,
+.jspsych-survey-html-form-radio-option-vertical.selected .checkmark-svg svg path,
+.jspsych-survey-html-form-checkbox-option-horizontal.selected .checkmark-svg svg path,
+.jspsych-survey-html-form-checkbox-option-vertical.selected .checkmark-svg svg path{
+    fill: white; /* Make the checkmark white */
+}
+
+
+.jspsych-survey-html-form-next.jspsych-btn {
+  background: #0B6ED0;
+  border-radius: 6px;
+  color: white;
+  border: 1px solid #207fde;
+  cursor: pointer;
+  padding: 8px 12px;
+  transition: background-color 0.2s ease;
+  &:hover {
+    background-color: #094a9e;
+    .bounce-right-hover {
+      transform: translateX(3px);
+    }
+  }
+}
+
+.bounce-right-hover {
+    /* Required for transform to work correctly on an inline element */
+    display: inline-block; 
+    
+    /* Smooth transition for the transform property */
+    transition: transform 0.2s ease-out; 
+}
+
+
+.jspsych-slider:focus {
+  outline: none;
+}
+
+/* Slider Track */
+.jspsych-slider::-webkit-slider-runnable-track,
+.jspsych-slider::-moz-range-track {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #eee;
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border-radius: 2px;
+  border: 1px solid #aaa;
+}
+
+.jspsych-slider::-ms-track {
+  appearance: none;
+  width: 99%;
+  height: 14px;
+  cursor: pointer;
+  background: #eee;
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border-radius: 2px;
+  border: 1px solid #aaa;
+}
+
+/* Slider Track: Unipolar, Clicked */
+.jspsych-slider.unipolar-clicked-purple::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #DDDDDD, #785ef0);
+}
+
+.jspsych-slider.unipolar-clicked-purple::-moz-range-track {
+  background: linear-gradient(to right, #DDDDDD, #785ef0);
+}
+
+.jspsych-slider.unipolar-clicked-purple::-ms-track {
+  background: linear-gradient(to right, #DDDDDD, #785ef0);
+}
+
+/* Slider Track: Bipolar, Clicked */
+.jspsych-slider.bipolar-clicked-orange-purple::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #fe6100, #DDDDDD 50%, #785ef0);
+}
+
+.jspsych-slider.bipolar-clicked-orange-purple::-moz-range-track {
+  background: linear-gradient(to right, #fe6100, #DDDDDD 50%, #785ef0);
+}
+
+.jspsych-slider.bipolar-clicked-orange-purple::-ms-track {
+  background: linear-gradient(to right, #fe6100, #DDDDDD 50%, #785ef0);
+}
+
+/* Slider Track: Unipolar, Clicked */
+.jspsych-slider.bipolar-clicked-blue-red::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #003db8, #DDDDDD 50%, #e91b23);
+}
+
+.jspsych-slider.bipolar-clicked-blue-red::-moz-range-track {
+  background: linear-gradient(to right, #003db8, #DDDDDD 50%, #e91b23);
+}
+
+.jspsych-slider.bipolar-clicked-blue-red::-ms-track {
+  background: linear-gradient(to right, #003db8, #DDDDDD 50%, #e91b23);
+}
+
+/* thumb */
+.jspsych-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border: 1px solid #666;
+  height: 24px;
+  width: 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: -9px;
+
+  /* background: 
+    repeating-linear-gradient(
+      0deg,
+      #999,
+      #999 1px,
+      transparent 1px,
+      transparent 4px
+    ) no-repeat 50% 50% / 60% 9px, 
+    #fff; */
+}
+
+.jspsych-slider::-moz-range-thumb {
+  border: 1px solid #666;
+  height: 24px;
+  width: 15px;
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+  appearance: none;
+  margin-top: -9px;
+}
+
+.jspsych-slider::-ms-thumb {
+  border: 1px solid #666;
+  height: 20px;
+  width: 15px;
+  border-radius: 5px;
+  background: #fff;
+  cursor: pointer;
+  margin-top: -2px;
+}
+
+/* Slider Anchors */
+.jspsych-slider-anchor-container {
+  display: flex;
+  align-items: flex-start; /* or center, for center vertical and horizontal */
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 10pt;
+  color: #333;
+  margin-top: 10px;
+}
+
+.jspsych-slider-left-anchor {
+  text-align: left;
+  flex: 1;
+}
+
+.jspsych-slider-center-anchor {
+  text-align: center;
+}
+
+.jspsych-slider-right-anchor {
+  text-align: right;
+  flex: 1;
+}
+
+.incomplete {
+  opacity: 0.85;
+}
+
+/* jsPsych Progress Bar */
+.jspsych-display-element {
+  overflow: visible !important;
+}
+
+#jspsych-progressbar-container {
+  position: sticky; /* Nathan Custom */
+  top: 0; /* Specify the distance from the top where it should stick */
+  z-index: 10; /* Optional: to ensure it stays above other content */
+  overflow: hidden;
+  color: #555;
+  border-bottom: 1px solid #dedede;
+  background-color: #f9f9f9;
+  margin-bottom: 1em;
+  text-align: center;
+  padding: 8px 0px;
+  width: 100%;
+  line-height: 1em;
+  align-self: flex-start;
+}
+
+#jspsych-progressbar-container span {
+  font-size: 14px;
+  padding-right: 14px;
+}
+
+#jspsych-progressbar-outer {
+  background-color: #eee;
+  width: 50%;
+  margin: auto;
+  height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+#jspsych-progressbar-inner {
+  background-color: #4caf50;
+  width: 0%;
+  height: 100%;
+  border-radius: 4px 0px 0px 4px;
+}
+
+/* Control appearance of jsPsych.data.displayData() */
+#jspsych-data-display {
+  text-align: left;
+}
+
+.jspsych-instructions {
+  text-align: left;
+  width: 75%;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  margin: 0 auto;
+}
+
+#jspsych-survey-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  z-index:999;
+}
+
+#jspsych-confirm-popup {
+  display: none; 
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  text-align: center;
+}
+
+/* Warning Icon */
+.warning-icon {
+  border-radius: 50%;
+  background-color: #fcf3de;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  border: 12px solid #fdfbf1;
+}
+
+.fa-triangle-exclamation {
+  color: #edb423;
+}
+
+
+
+
+.jspsych-instructions-greyed-out {
+  opacity: 0.4; /* Or use your var(--deactivated-color) */
+  filter: grayscale(100%);
+  margin-bottom: 10px;
+}
+
+.jspsych-instructions-active {
+  opacity: 1;
+  border-left: 3px solid #007bff; /* Optional: highlight the new part */
+  padding-left: 15px;
+}
+
