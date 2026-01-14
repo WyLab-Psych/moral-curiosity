@@ -257,14 +257,14 @@ const instruction_pages = [
 
 // STUDY INSTRUCTIONS
 // Define the trial structure
-const pageInstructions = {
+const page_instructions = {
   type: jsPsychWyLabSurvey,
   preamble: jsPsych.timelineVariable('full_html'), 
   button_label: 'Next Page'
 };
 
-const blockInstructions = {
-  timeline: [pageInstructions],
+const block_instructions = {
+  timeline: [page_instructions],
   timeline_variables: instruction_pages.map((currentContent, index) => {
     
     // 1. Retrieve all previous instructions
@@ -290,7 +290,7 @@ const blockInstructions = {
   randomize_order: false
 };
 
-// timeline.push(blockInstructions);
+timeline.push(block_instructions);
 
 
 
