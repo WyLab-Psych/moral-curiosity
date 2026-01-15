@@ -47,35 +47,34 @@ var jsPsych = initJsPsych({
 });
 
 // Set up filename for debugging
-const participantId = jsPsych.randomization.randomID(10);
-const filename = `${participantId}.csv`;
+// const participantId = jsPsych.randomization.randomID(10);
+// const filename = `${participantId}.csv`;
 
 // Set up filename for actual run
-// const participantId = jsPsych.data.getURLVariable('PROLIFIC_PID');
-// const studyId = jsPsych.data.getURLVariable('STUDY_ID');
-// const sessionId = jsPsych.data.getURLVariable('SESSION_ID');
-// const filename = `${participantId}` + "_" + `${studyId}` + "_" + `${sessionId}.csv`;
+const participant_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
+const study_id = jsPsych.data.getURLVariable('STUDY_ID');
+const session_id = jsPsych.data.getURLVariable('SESSION_ID');
+const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
 
 jsPsych.data.addProperties({
-  participantId: participantId,
-  // studyId: studyId,
-  // sessionId: sessionId
+  participant_id: participant_id,
+  study_id: study_id,
+  session_id: session_id
 });
 
 // ---------------- PAGE 1 ---------------- //
 // ENTER FULLSCREEN
-const blockEnterFullscreen = {
+const block_enter_fullscreen = {
   type: jsPsychFullscreen,
   name: 'enter_fullscreen',
   fullscreen_mode: true,
   delay_after: 0
 };
-timeline.push(blockEnterFullscreen)
+timeline.push(block_enter_fullscreen)
 
 // ---------------- PAGE 2 ---------------- //
 // CONSENT FORM
 const completion_time = 10;  // in minutes
-const compensation = 10;  // in dollars
 
 const block_consent_form = {
   type: jsPsychWyLabSurvey,
@@ -131,7 +130,7 @@ const block_consent_form = {
     <section>
       <h3><i class="fa fa-2xs fa-chevron-circle-down"></i>&nbsp;<strong>Incentives for participation</strong></h3>
       <p class="indented align-left">
-        If participating through Prolific/Cloud, you will be paid <strong>$${compensation.toFixed(2)} ($${(compensation / (completion_time / 60)).toFixed(2)}/hour)</strong> for your participation in the study.
+        If participating through Prolific/Cloud, you will be paid <strong>$${(9 / 60 * completion_time).toFixed(2)} ($9.00/hour)</strong> for your participation in the study.
       </p>
     </section>
     
@@ -246,7 +245,7 @@ const instruction_pages = [
 
   // 3. Study Design
   `<p class="align-left">
-    You will be asked to answer questions about a total of <strong>20 people.</strong> Please read each description carefully, and answer as honestly as possible.
+    You will be asked to answer questions about a total of <strong>10 people.</strong> Please read each description carefully, and answer as honestly as possible.
   </p>`,
 
   // 4. Advance
@@ -265,13 +264,13 @@ const page_instructions = {
 
 const block_instructions = {
   timeline: [page_instructions],
-  timeline_variables: instruction_pages.map((currentContent, index) => {
+  timeline_variables: instruction_pages.map((current_content, index) => {
     
     // 1. Retrieve all previous instructions
-    const previousContent = instruction_pages.slice(0, index);
+    const previous_content = instruction_pages.slice(0, index);
     
     // 2. Wrap previous instructions in the greyed-out class
-    const greyedOutHTML = previousContent
+    const greyed_out_html = previous_content
       .map(html => `<section class="jspsych-instructions-greyed-out">${html}</section>`)
       .join('');
 
@@ -280,9 +279,9 @@ const block_instructions = {
       full_html: `
         <main class="jspsych-survey-html-form-preamble jspsych-instructions">
           <h2>Study Instructions</h2>
-          ${greyedOutHTML}
+          ${greyed_out_html}
           <section class="jspsych-instructions-active">
-            ${currentContent}
+            ${current_content}
           </section>
         </main>`
     };
@@ -345,8 +344,8 @@ const main_task_stimuli = stimuli
 const moral_pool = main_task_stimuli.filter(s => s.morality === 'moral');
 const immoral_pool = main_task_stimuli.filter(s => s.morality === 'immoral');
 
-const selected_moral = jsPsych.randomization.sampleWithoutReplacement(moral_pool, 10);
-const selected_immoral = jsPsych.randomization.sampleWithoutReplacement(immoral_pool, 10);
+const selected_moral = jsPsych.randomization.sampleWithoutReplacement(moral_pool, 5);
+const selected_immoral = jsPsych.randomization.sampleWithoutReplacement(immoral_pool, 5);
 
 // Combine and shuffle for the individual participant
 const participant_stimuli = jsPsych.randomization.shuffle([...selected_moral, ...selected_immoral]);
