@@ -1,5 +1,4 @@
 /* Import Inter from Google Fonts */
-/* @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap'); */
 @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap');
 
 
@@ -887,7 +886,7 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   background: linear-gradient(to right, #003db8, #DDDDDD 50%, #e91b23);
 }
 
-/* thumb */
+/* Slider Thumb */
 .jspsych-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   border: 1px solid #666;
@@ -896,16 +895,6 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   border-radius: 5px;
   cursor: pointer;
   margin-top: -9px;
-
-  /* background: 
-    repeating-linear-gradient(
-      0deg,
-      #999,
-      #999 1px,
-      transparent 1px,
-      transparent 4px
-    ) no-repeat 50% 50% / 60% 9px, 
-    #fff; */
 }
 
 .jspsych-slider::-moz-range-thumb {
@@ -937,7 +926,7 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   justify-content: space-between;
   font-size: 10pt;
   color: #333;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 .jspsych-slider-left-anchor {
@@ -1012,10 +1001,10 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   width: 75%;
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
   margin: 0 auto;
 }
 
+/* Modal Popup for Survey Plugin */
 #jspsych-survey-overlay {
   display: none;
   position: fixed;
@@ -1062,7 +1051,7 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
 
 
 .jspsych-instructions-greyed-out {
-  opacity: 0.4; /* Or use your var(--deactivated-color) */
+  opacity: 0.4;
   filter: grayscale(100%);
   margin-bottom: 10px;
 }
@@ -1072,4 +1061,3 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   border-left: 3px solid #007bff; /* Optional: highlight the new part */
   padding-left: 15px;
 }
-

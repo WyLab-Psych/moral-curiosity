@@ -46,10 +46,6 @@ var jsPsych = initJsPsych({
   }  
 });
 
-// Set up filename for debugging
-// const participantId = jsPsych.randomization.randomID(10);
-// const filename = `${participantId}.csv`;
-
 // Set up filename for actual run
 const participant_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
 const study_id = jsPsych.data.getURLVariable('STUDY_ID');
@@ -454,16 +450,14 @@ const page_norming = {
   ],
   button_label: 'Next Page',
   data: {
-    stimulus_name: jsPsych.timelineVariable('target_name'),
-    stimulus_morality: jsPsych.timelineVariable('target_morality')
+    target_name: jsPsych.timelineVariable('target_name'),
+    target_morality: jsPsych.timelineVariable('target_morality')
   },
   on_finish: function(data) {
     norming_trial_count++;
     data.norming_trial_number = norming_trial_count;
-    data.target_name = data.stimulus_name;
-    data.target_morality = data.stimulus_morality;
     
-    data.familiarity_binary = data.response['familiarity_binary'];
+    data.familiarity_binary = data.response['familiarity_binary']?.toLowerCase() || null;
     data.morality = data.response['morality'];
     data.familiarity = data.response['familiarity'];
     data.uncertainty = data.response['uncertainty'];
@@ -516,8 +510,32 @@ const block_fiction_question = {
   ],
   button_label: 'Next Page',
   on_finish: function(data) {
-    const resp = data.response;
-    data.fiction_consumption = resp['fiction_consumption'] || '';
+    switch (data.response['fiction_consumption']) {
+      case "1<br>None":
+        data.fiction_consumption = 1;
+        break;
+      case "2":
+        data.fiction_consumption = 2;
+        break;
+      case "3":
+        data.fiction_consumption = 3;
+        break;
+      case "4":
+        data.fiction_consumption = 4;
+        break;
+      case "5":
+        data.fiction_consumption = 5;
+        break;
+      case "6":
+        data.fiction_consumption = 6;
+        break;
+      case "7<br>A great deal":
+        data.fiction_consumption = 7;
+        break;
+    };
+    jsPsych.data.addProperties({
+      fiction_consumption: data.fiction_consumption || null
+    })
   }
 };
 timeline.push(block_fiction_question);
@@ -642,29 +660,29 @@ const block_attention = {
   on_finish: function(data) {
     switch (data.response['attention']) {
       case "1<br>Not at all":
-        data.attention_num = 1;
+        data.attention = 1;
         break;
       case "2":
-        data.attention_num = 2;
+        data.attention = 2;
         break;
       case "3":
-        data.attention_num = 3;
+        data.attention = 3;
         break;
       case "4":
-        data.attention_num = 4;
+        data.attention = 4;
         break;
       case "5":
-        data.attention_num = 5;
+        data.attention = 5;
         break;
       case "6":
-        data.attention_num = 6;
+        data.attention = 6;
         break;
       case "7<br>Completely":
-        data.attention_num = 7;
+        data.attention = 7;
         break;
     };
     jsPsych.data.addProperties({
-      attention: data.attention_num
+      attention: data.attention || null
     })
   }
 };
@@ -732,7 +750,9 @@ const block_feedback = {
     }
   ],
   on_finish: function (data) {
-    data.feedback = data.response['feedback'];
+    jsPsych.data.addProperties({
+      feedback: data.response['feedback']
+    });
   }
 };
 timeline.push(block_feedback);

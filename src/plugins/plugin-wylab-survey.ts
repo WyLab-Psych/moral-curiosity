@@ -1,3 +1,4 @@
+import $ from "jquery";
 import { JsPsych, JsPsychPlugin, ParameterType, TrialType } from "jspsych";
 
 const info = <const>{
