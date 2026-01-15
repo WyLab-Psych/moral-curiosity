@@ -229,26 +229,30 @@ const instruction_pages = [
   // 1. Introduction
   `<p class="align-left" style="margin-bottom: 1em;">Welcome! Thank you for agreeing to participate 🙂</p>
   
-  <p class="align-left" style="margin-bottom: 1em;">
-    In this study, we are interested in understanding how you think and feel about some <strong>real people</strong> from history.
-  </p>
-
   <p class="align-left">
-    On each trial, you will read a brief description of someone and then answer questions about them. 
-    Some of the text is intentionally blurred out, so please try your best to answer based only on what you are able to read.
+    In this study, we are interested in understanding how you think and feel about some <strong>real people</strong> from history.
   </p>`,
 
-  // 2. Source Credibility
+  // 2. Task Overview
+  `<p class="align-left" style="margin-bottom: 1em;">
+    On each trial, you will read a brief description of someone and then answer questions about them. 
+    Some of the text is intentionally blurred out, so please try your best to answer based only on what you are able to read.
+  </p>
+  <p class="align-left">
+    Please note that some descriptions include potentially disturbing content, including violence, sexual assault, or other sensitive topics.
+  </p>`,
+
+  // 3. Source Credibility
   `<p class="align-left">
     We selected <strong>real but mostly unknown</strong> people for you to rate using information collected from a variety of sources.
   </p>`,
 
-  // 3. Study Design
+  // 4. Study Design
   `<p class="align-left">
     You will be asked to answer questions about a total of <strong>10 people.</strong> Please read each description carefully, and answer as honestly as possible.
   </p>`,
 
-  // 4. Advance
+  // 5. Advance
   `<p class="align-left">
     When you are ready to begin, please click the <strong style="color: #0B6ED0;">Next Page</strong> button to advance!
   </p>`
