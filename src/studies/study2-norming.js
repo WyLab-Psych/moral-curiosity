@@ -6,7 +6,7 @@
 // HOW do we deconfound effort from avoiding?
 // one way is we can show something else when they avoid -- like a neutral image or something filler.
 // this is a strong test of avoid
-import stimuli from './stimuli/norming-targets.json' with { type: 'json' }
+import stimuli from '../stimuli/norming-targets.json' with { type: 'json' }
 
 // Import FontAwesome icons
 import { library, dom } from '@fortawesome/fontawesome-svg-core'
@@ -21,7 +21,7 @@ import './custom.css';
 
 // Import core jsPsych plugins
 import jsPsychFullscreen from '@jspsych/plugin-fullscreen';
-import jsPsychWyLabSurvey from './plugins/plugin-wylab-survey';
+import jsPsychWyLabSurvey from '../plugins/plugin-wylab-survey';
 
 // Import officially contributed jsPsych plugins
 import jsPsychPipe from '@jspsych-contrib/plugin-pipe';
@@ -68,7 +68,7 @@ const block_enter_fullscreen = {
 };
 timeline.push(block_enter_fullscreen)
 
-// ---------------- PAGE 2 ---------------- //
+// ---------------- PAGE 2 ---------------- // 
 // CONSENT FORM
 const completion_time = 10;  // in minutes
 

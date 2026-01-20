@@ -110,9 +110,13 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
 
   trial(display_element: HTMLElement, trial: TrialType<Info>) {
     const checkPath = "M17.8062 7.37181C18.0841 7.67897 18.0603 8.15325 17.7532 8.43115L9.8782 15.5562C9.59605 15.8114 9.16747 15.815 8.88113 15.5644L5.88113 12.9394C5.5694 12.6667 5.53782 12.1928 5.81058 11.8811C6.08334 11.5694 6.55716 11.5378 6.86889 11.8106L9.36667 13.9961L16.7468 7.31885C17.054 7.04094 17.5283 7.06466 17.8062 7.37181Z";
-    const xPath = "M14.5,12l2.3,-2.3c0.4,-0.4,0.4,-1.1,0,-1.5l-0.8,-0.8c-0.4,-0.4,-1.1,-0.4,-1.5,0L12,9.7L9.7,7.4c-0.4,-0.4,-1.1,-0.4,-1.5,0L7.4,8.2c-0.4,0.4,-0.4,1.1,0,1.5L9.7,12l-2.3,2.3c-0.4,0.4,-0.4,1.1,0,1.5l0.8,0.8c0.4,0.4,1.1,0.4,1.5,0l2.3,-2.3l2.3,2.3c0.4,0.4,1.1,0.4,1.5,0l0.8,-0.8c0.4,-0.4,0.4,-1.1,0,-1.5L14.5,12z";
+    const xPath = "M123.55 164.7c-6.25-6.25-16.4-6.25-22.65 0s-6.25 16.4 0 22.65L169.6 256l-68.65 68.7c-6.25 6.25-6.25 16.4 0 22.65s16.4 6.25 22.65 0L192.25 278.65l68.7 68.65c6.25 6.25 16.4 6.25 22.65 0s6.25-16.4 0-22.65L214.9 256l68.65-68.7c6.25-6.25 6.25-16.4 0-22.65s-16.4-6.25-22.65 0L192.25 233.35 123.55 164.7z";
     const questions = trial.questions ?? [];
     let html = "";
+
+    $(function() {
+      $('html, body').scrollTop(0);
+    });
     
     // 1. Build Preamble
     if (trial.preamble !== null) {
@@ -188,9 +192,9 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
             
             if (question.write_in && question.write_in.includes(question.options[option_idx])) {
               html += `<input type="text" name="${question_name}-writein" class="jspsych-survey-html-form-writein">`;
-            }
+            };
             html += `</label>`;
-          }
+          };
           html += `</div>`;
         }
 
@@ -230,8 +234,8 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
               type="text"
               ${short_text_max_length}
               ${short_text_placeholder}
-              ${question_requirements}>
-          `;
+              ${question_requirements}
+            >`;
 
         // LONG TEXT INPUT
         } else if (question_format == "essay") {
@@ -290,9 +294,9 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
     // 6. SINGLE INJECTION POINT
     display_element.innerHTML = html;
     
-    $(document).ready(function() {
-        $('html, body').scrollTop(0);
-    });
+    // $(document).ready(function() {
+    //     $('html, body').scrollTop(0);
+    // });
 
     if (!trial.custom_html) {
       // --- START POST-INJECTION LOGIC ---
@@ -319,7 +323,7 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
 
             // 4. Trigger validation so the 'incomplete' warning disappears
             associatedInput.dispatchEvent(new Event('input', { bubbles: true }));
-          }
+          };
         });
       });
 
@@ -327,7 +331,7 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
       const container = display_element.querySelector('.jspsych-survey-html-form-options-container-horizontal') as HTMLElement;
       if (container) {
         container.style.setProperty('--option-count', container.children.length.toString());
-      }
+      };
 
       // Initialize Sliders
       display_element.querySelectorAll<HTMLInputElement>('input[type="range"]').forEach(s => {
@@ -358,8 +362,8 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
             fieldset.classList.remove('incomplete');
           } else {
             fieldset.classList.add('incomplete');
-          }
-        }
+          };
+        };
 
         // 2. Logic for Multiple Choice (Including those with write-ins)
         if (target.type === 'radio' || target.type === 'checkbox') {
@@ -372,9 +376,9 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
             display_element.querySelectorAll(`input[name="${target.name}"]`).forEach(i => {
               i.closest('label')?.classList.remove('selected');
             });
-          }
+          };
           target.checked ? label?.classList.add('selected') : label?.classList.remove('selected');
-        }
+        };
       });
 
       // 3. Special Case for Sliders (mousedown counts as interaction even if value doesn't change)
@@ -384,7 +388,7 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
           slider.setAttribute('data-touched', 'true');
         });
       });
-    }
+    };
 
     // Form Submission
     const form = display_element.querySelector(".jspsych-survey-html-form") as HTMLFormElement;
@@ -403,7 +407,7 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
       nextBtn.disabled = false;
       nextBtn.style.opacity = "1";
       nextBtn.style.cursor = "pointer";
-    }
+    };
 
     // Helper function to toggle the 'locked' state of questions
     function setQuestionsLocked(isLocked: boolean) {
@@ -419,11 +423,11 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
               input.classList.add('locked-input');
             } else {
               input.classList.remove('locked-input');
-            }
+            };
           });
-        }
+        };
       });
-    }
+    };
 
 
 
@@ -432,7 +436,7 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
         resetComprehensionQuestions();
         setQuestionsLocked(false);
         return;
-      }
+      };
 
       let allCorrect = true; // Start true
       const currentResponses = objectifyForm(serializeArray(form));
@@ -451,15 +455,26 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
           if (isCorrect) {
             fieldset.classList.replace("comprehension-check-fail", "comprehension-check-success") || fieldset.classList.add("comprehension-check-success");
             svgPathElement?.setAttribute("d", checkPath);
+            if (selectedLabel) selectedLabel.innerHTML += "";
+
+            // Select all labels in the fieldset that DO NOT have the 'selected' class
+            const otherLabels = fieldset.querySelectorAll('label:not(.selected)');
+
+            // Loop through and change their opacity
+            otherLabels.forEach(label => {
+              (label as HTMLElement).style.opacity = '0.5';
+            });
+            
           } else {
             fieldset.classList.replace("comprehension-check-success", "comprehension-check-fail") || fieldset.classList.add("comprehension-check-fail");
             svgPathElement?.setAttribute("d", xPath);
+            svgPathElement?.parentElement?.setAttribute("viewBox", "0 0 384 512");
             allCorrect = false; // If ANY question is wrong, this becomes false
-          }
+          };
 
           const feedback = fieldset.querySelector(".feedback-container") as HTMLElement;
           if (feedback) feedback.style.display = "block";
-        }
+        };
       });
 
       // Crucial: Only unlock if allCorrect is STILL true after the loop
@@ -476,7 +491,7 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
         nextBtn.disabled = true;
         nextBtn.style.opacity = "0.5";
         nextBtn.style.cursor = "not-allowed";
-      }
+      };
     });
 
     // Helper function to reset the UI and Values
@@ -509,15 +524,15 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
               input.setAttribute('data-touched', 'false');
             } else {
               input.value = "";
-            }
+            };
           });
-        }
+        };
       });
 
       // Reset button state
       checkBtn.setAttribute("data-state", "check");
       checkBtn.innerHTML = 'Check Answers';
-    }
+    };
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -547,7 +562,7 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
             form.dispatchEvent(new Event('submit'));
           }, { once: true });
           return;
-        }
+        };
 
         // --- Final processing and finishing trial ---
         display_element.querySelectorAll<HTMLInputElement>('input[type="range"]').forEach(s => {
@@ -582,11 +597,11 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
         if ((field.type !== "checkbox" && field.type !== "radio") || field.checked) {
           if (field.value !== "" && field.value !== null) {
             data.push({ name: field.name, value: field.value });
-          }
-        }
-      }
+          };
+        };
+      };
       return data;
-    }
+    };
 
     function objectifyForm(arr: any[]) {
       const obj: any = {};
@@ -596,8 +611,8 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
         } else { obj[i.name] = i.value; }
       });
       return obj;
-    }
-  }
-}
+    };
+  };
+};
 
 export default WyLabSurveyPlugin;

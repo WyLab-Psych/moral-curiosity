@@ -17,6 +17,12 @@
   font-family: "Inter Tight", sans-serif !important;
 }
 
+input[type="radio"], 
+input[type="checkbox"] {
+  margin: 0;
+  vertical-align: middle; /* Helps with text alignment */
+}
+
 h2 {
   text-align: center;
   font-size: 16pt;
@@ -665,7 +671,7 @@ input[type="number"] {
 }
 
 .comprehension-check-success > div > label.selected{
-  background-color: #f1f9f5;
+  background-color: #EBF9EB;
   &:focus-within {
     border: 2.5px solid #107e3e;
   }
