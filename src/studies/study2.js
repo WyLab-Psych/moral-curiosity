@@ -75,7 +75,11 @@ const block_captcha = {
     <p class="jspsych-survey-multi-choice-preamble">
       To ensure that you are a human participant, please select the option "I am human" below:
     </p>
-    <div class="g-recaptcha" data-sitekey="6LfBRVAsAAAAAB7bci0_0TlzXC5Bv8vgZg2R7s_a"></div>
+    <form action="" method="POST">
+      <div class="g-recaptcha" data-sitekey="6LfBRVAsAAAAAB7bci0_0TlzXC5Bv8vgZg2R7s_a" data-action="checkout"></div>
+      <br/>
+      <input type="submit" value="Submit">
+    </form>
     `,
   questions: []
 };
