@@ -328,10 +328,14 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
       });
 
       // Dynamic Horizontal Width
-      const container = display_element.querySelector('.jspsych-survey-html-form-options-container-horizontal') as HTMLElement;
-      if (container) {
-        container.style.setProperty('--option-count', container.children.length.toString());
-      };
+      // Use querySelectorAll to find ALL horizontal containers on the page
+      const containers = display_element.querySelectorAll('.jspsych-survey-html-form-options-container-horizontal');
+
+      containers.forEach((container) => {
+        const htmlContainer = container as HTMLElement;
+        // Set the --option-count for each individual container based on its own children
+        htmlContainer.style.setProperty('--option-count', htmlContainer.children.length.toString());
+      });
 
       // Initialize Sliders
       display_element.querySelectorAll<HTMLInputElement>('input[type="range"]').forEach(s => {

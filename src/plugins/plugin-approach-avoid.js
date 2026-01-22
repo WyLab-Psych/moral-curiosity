@@ -23,26 +23,6 @@ var jsPsychApproachAvoidTaskPlugin = (function() {
 
   // const moralBad = [stimuli.bad['Beverley Allitt']];
 
-  const moralBad = [
-    `<strong>Amelia Dyer</strong> was a notorious English baby farmer and serial killer active during the late 19th century. 
-     She is believed to have murdered hundreds of infants in her care, making her one of the most prolific 
-     serial killers in history. Dyer began her career as a nurse and midwife, but soon turned to baby farming, 
-     a practice where she would take in unwanted infants for a fee. However, instead of caring for these children, 
-     Dyer would often neglect them or even kill them to avoid the cost of their upkeep. In 1896, Dyer was finally 
-     caught and arrested after the body of an infant was found in the River Thames. She was subsequently tried and 
-     convicted of murder and was hanged in 1896. Her case shocked Victorian society and led to increased regulation of baby farming practices.`
-  ];
-
-    const moralGood = [
-    `<strong>Amelia Dyer</strong> was a notorious English baby farmer and serial killer active during the late 19th century. 
-     She is believed to have murdered hundreds of infants in her care, making her one of the most prolific 
-     serial killers in history. Dyer began her career as a nurse and midwife, but soon turned to baby farming, 
-     a practice where she would take in unwanted infants for a fee. However, instead of caring for these children, 
-     Dyer would often neglect them or even kill them to avoid the cost of their upkeep. In 1896, Dyer was finally 
-     caught and arrested after the body of an infant was found in the River Thames. She was subsequently tried and 
-     convicted of murder and was hanged in 1896. Her case shocked Victorian society and led to increased regulation of baby farming practices.`
-  ];
-
   // --- INFO OBJECT DEFINITION ---
   const info = {
     name: "plugin-jspsych-approach-avoid-task",

@@ -27,10 +27,6 @@ import jsPsychWyLabSurvey from '../plugins/plugin-wylab-survey';
 // Import officially contributed jsPsych plugins
 import jsPsychPipe from '@jspsych-contrib/plugin-pipe';
 
-// Import third-party jsPsych plugins
-import { jsPsychApproachAvoidTaskPlugin } from '../plugins/plugin-approach-avoid';
-
-
 dom.watch();
 
 // ---------------- PAGE 0 ---------------- //
@@ -75,13 +71,21 @@ const block_captcha = {
     <p class="jspsych-survey-multi-choice-preamble">
       To ensure that you are a human participant, please select the option "I am human" below:
     </p>
-    <form action="" method="POST">
-      <div class="g-recaptcha" data-sitekey="6LfBRVAsAAAAAB7bci0_0TlzXC5Bv8vgZg2R7s_a" data-action="checkout"></div>
-      <br/>
-      <input type="submit" value="Submit">
-    </form>
+    <div id="recaptcha-container" class="g-recaptcha-enterprise" 
+         data-sitekey="6LfBRVAsAAAAAB7bci0_0TlzXC5Bv8vgZg2R7s_a" 
+         data-action="LOGIN"></div>
     `,
-  questions: []
+  questions: [],
+  on_load: function() {
+    // Check if grecaptcha is loaded and then manually render it
+    if (window.grecaptcha && window.grecaptcha.enterprise) {
+      grecaptcha.enterprise.render('recaptcha-container');
+    }
+  },
+  on_finish: function(data) {
+  // Capture the token so it appears in your CSV/JSON output
+    data.captcha_token = grecaptcha.enterprise.getResponse();
+  }
 };
 
 // ENTER FULLSCREEN
@@ -91,13 +95,14 @@ const block_enter_fullscreen = {
   fullscreen_mode: true,
   delay_after: 0
 };
-timeline.push([block_browser_check, block_captcha, block_enter_fullscreen]);
+timeline.push([block_browser_check,block_enter_fullscreen]);
 
 // ---------------- PAGE 2 ---------------- // 
 // CONSENT FORM
 const block_consent_form = {
   type: jsPsychWyLabSurvey,
   preamble: `
+  <div class="jspsych-consent-form">
     <section> 
       <h2 style="text-align: center"><strong>Consent Form</strong></h2>
 
@@ -188,9 +193,9 @@ const block_consent_form = {
       <p class="indented align-left">
         The main researcher conducting this study is Jordan Wylie, a professor at Cornell University. 
         Please ask any questions you have now. If you have questions later, you may contact Professor 
-        Jordan Wylie <a href="mailto:jordan.wylie@cornell.edu"><i class="fa-solid fa-envelope fa-xs"></i>&nbsp;jordan.wylie@cornell.edu</a>&nbsp;or <a href="tel:16072554486"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255-4486</a>. If you have any questions or concerns regarding 
+        Jordan Wylie <a href="mailto:jordan.wylie@cornell.edu"><i class="fa-solid fa-envelope fa-xs"></i>&nbsp;jordan.wylie@cornell.edu</a>&nbsp;or <a href="tel:16072554486"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255&nbsp;4486</a>. If you have any questions or concerns regarding 
         our rights as a subject in this study, you may contact the Institutional Review Board (IRB) for 
-        Human Participants <a href="tel:16072556182"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255-6182</a> or access their 
+        Human Participants <a href="tel:16072556182"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255&nbsp;6182</a> or access their 
         website <a href="https://researchservices.cornell.edu/offices/IRB" rel="noopener" target="_blank">researchservices.cornell.edu/offices/IRB&nbsp;<i class="fa-solid fa-arrow-up-right-from-square fa-xs"></i></a>. 
         You may also report your concerns or complaints anonymously online via 
         NAVEX <a href="http://www.hotline.cornell.edu" rel="noopener" target="_blank">hotline.cornell.edu&nbsp;<i class="fa-solid fa-external-link fa-xs"></i></a>
@@ -206,7 +211,8 @@ const block_consent_form = {
         I have read the above information, and have received answers to any questions I asked. 
         I consent to take part in the study. 
       </p>
-    </section>`,
+    </section>
+  </div>`,
   questions: [
     { 
       name: 'consent',
@@ -241,7 +247,7 @@ const instruction_pages = [
 
   // 2. Task Overview
   `<p class="align-left" style="margin-bottom: 1em;">
-    On each trial, you will read a brief description of someone and then answer questions about them. 
+    On each trial, you will read a brief description of someone and then answer questions about what you think and feel about that information. 
     Some of the text is intentionally blurred out to start, and you will be asked whether you would like to learn more or skip the trial.
   </p>
   <p class="align-left">
@@ -255,10 +261,15 @@ const instruction_pages = [
 
   // 4. Study Design
   `<p class="align-left">
-    You will be asked to answer questions about a total of <strong>10 people.</strong> Please read each description carefully, and answer as honestly as possible.
+    You will be asked to answer questions about a total of <strong>20 people.</strong> Please read each description carefully, and answer as honestly as possible.
   </p>`,
 
-  // 5. Advance
+  // 5. Pre-/Post-Questions
+  `<p class="align-left">
+    Before and after the main task, you will also be asked some questions about your general worldview and current feelings.
+  </p>`,
+
+  // 6. Advance
   `<p class="align-left">
     When you are ready to begin, please click the <strong style="color: #0B6ED0;">Next Page</strong> button to advance!
   </p>`
@@ -299,93 +310,123 @@ const block_instructions = {
   randomize_order: false
 };
 
+
 // ---------------- PAGE 4 ---------------- //
-// STUDY INSTRUCTIONS
-const block_comprehension_check = {
+// PRE-TASK
+const block_pre_task = {
   type: jsPsychWyLabSurvey,
   preamble: `
-    <main>
-      <div class="jspsych-instructions">
-        <h2>Review</h2>
-        
-        <p>Great, let's review what you just read.</p> 
-
-        <p>Please answer the following questions to the best of your ability.</p>
-      </div>
-    </main>`,
+    <p class="jspsych-survey-multi-choice-preamble">
+      Before you begin the main task, please respond to the following questions:
+    </p>`,
   questions: [
     {
-      name: 'comprehension_check_1',
-      prompt: 'How many people will you be asked to read about in this study?',
-      format: { type: 'radio' },
-      options: [
-        "Read descriptions of historical figures and answer questions about them",
-        "Watch videos and answer questions about them",
-        "Complete puzzles and answer questions about them"
-      ],
-      feedback: [
-        "Yes, that's right! You will read about historical figures.",
-        "No, that's not correct. Please try again.",
-        "No, that's not correct. Please try again.",
-      ],
-      requirements: {
-        type: 'comprehension',
-        correct_answer: 'Read descriptions of historical figures and answer questions about them',
-      }
+      prompt: "To what extent do you agree that most people in the world lead lives that are <strong>morally good?</strong>",
+      name: 'pre_worldview',
+      options: ["1<br>Strongly disagree", "2", "3", "4<br>Neutral", "5", "6", "7<br>Strongly agree"],
+      format: {
+        type: 'radio',
+        mc_orientation: 'horizontal'
+      },
+      requirements: { type: 'request' }
     },
     {
-      name: 'comprehension_check_2',
-      prompt: 'What will you be asked to do in this study?',
-      format: { type: 'radio' },
-      options: [
-        "Read descriptions of historical figures and answer questions about them",
-        "Watch videos and answer questions about them",
-        "Complete puzzles and answer questions about them"
-      ],
-      feedback: [
-        "Yes, that's right! You will read about historical figures.",
-        "No, that's not correct. Please try again.",
-        "No, that's not correct. Please try again.",
-      ],
-      requirements: {
-        type: 'comprehension',
-        correct_answer: 'Read descriptions of historical figures and answer questions about them',
-      }
-    },
-    {
-      name: 'comprehension_check_3',
-      prompt: 'What will you be asked to do in this study?',
-      format: { type: 'radio' },
-      options: [
-        "Read descriptions of historical figures and answer questions about them",
-        "Watch videos and answer questions about them",
-        "Complete puzzles and answer questions about them"
-      ],
-      feedback: [
-        "Yes, that's right! You will read about historical figures.",
-        "No, that's not correct. Please try again.",
-        "No, that's not correct. Please try again.",
-      ],
-      requirements: {
-        type: 'comprehension',
-        correct_answer: 'Read descriptions of historical figures and answer questions about them',
-      }
+      prompt: "How positive or negative do you feel?",
+      name: 'pre_valence',
+      options: ["1<br>Strongly negative", "2", "3", "4<br>Neutral", "5", "6", "7<br>Strongly positive"],
+      format: {
+        type: 'radio',
+        mc_orientation: 'horizontal'
+      },
+      requirements: { type: 'request' }
     }
   ],
-  button_label: 'Next Page'
+  button_label: 'Next Page',
+  on_finish: function(data) {
+    jsPsych.data.addProperties({
+      pre_worldview: data.response['pre_worldview'],
+      pre_valence: data.response['pre_valence']
+    });
+  }
 };
 
-// ---------------- PAGE 5 ---------------- //
-const block_approach_avoid = {
-  type: jsPsychApproachAvoidTaskPlugin,
-  trial_duration_seconds: 1,
-  num_cards: 16,
-  prompt_text: "Would you like to read more?",
-  continue_button_text: ["Yes", "No"]
-};
+// STUDY INSTRUCTIONS
+// const block_comprehension_check = {
+//   type: jsPsychWyLabSurvey,
+//   preamble: `
+//     <main>
+//       <div class="jspsych-instructions">
+//         <h2>Review</h2>
+        
+//         <p>Great, let's review what you just read.</p> 
+
+//         <p>Please answer the following questions to the best of your ability.</p>
+//       </div>
+//     </main>`,
+//   questions: [
+//     {
+//       name: 'comprehension_check_1',
+//       prompt: 'How many people will you be asked to read about in this study?',
+//       format: { type: 'radio' },
+//       options: [
+//         "Read descriptions of historical figures and answer questions about them",
+//         "Watch videos and answer questions about them",
+//         "Complete puzzles and answer questions about them"
+//       ],
+//       feedback: [
+//         "Yes, that's right! You will read about historical figures.",
+//         "No, that's not correct. Please try again.",
+//         "No, that's not correct. Please try again.",
+//       ],
+//       requirements: {
+//         type: 'comprehension',
+//         correct_answer: 'Read descriptions of historical figures and answer questions about them',
+//       }
+//     },
+//     {
+//       name: 'comprehension_check_2',
+//       prompt: 'What will you be asked to do in this study?',
+//       format: { type: 'radio' },
+//       options: [
+//         "Read descriptions of historical figures and answer questions about them",
+//         "Watch videos and answer questions about them",
+//         "Complete puzzles and answer questions about them"
+//       ],
+//       feedback: [
+//         "Yes, that's right! You will read about historical figures.",
+//         "No, that's not correct. Please try again.",
+//         "No, that's not correct. Please try again.",
+//       ],
+//       requirements: {
+//         type: 'comprehension',
+//         correct_answer: 'Read descriptions of historical figures and answer questions about them',
+//       }
+//     },
+//     {
+//       name: 'comprehension_check_3',
+//       prompt: 'What will you be asked to do in this study?',
+//       format: { type: 'radio' },
+//       options: [
+//         "Read descriptions of historical figures and answer questions about them",
+//         "Watch videos and answer questions about them",
+//         "Complete puzzles and answer questions about them"
+//       ],
+//       feedback: [
+//         "Yes, that's right! You will read about historical figures.",
+//         "No, that's not correct. Please try again.",
+//         "No, that's not correct. Please try again.",
+//       ],
+//       requirements: {
+//         type: 'comprehension',
+//         correct_answer: 'Read descriptions of historical figures and answer questions about them',
+//       }
+//     }
+//   ],
+//   button_label: 'Next Page'
+// };
 
 
-
+// ---------------- PAGE 5+ ---------------- //
 // NORMING TASK
 const main_task_stimuli = stimuli
 
@@ -399,143 +440,157 @@ const selected_immoral = jsPsych.randomization.sampleWithoutReplacement(immoral_
 const participant_stimuli = jsPsych.randomization.shuffle([...selected_moral, ...selected_immoral]);
 let norming_trial_count = 0; // Initialize at 0
 
-const page_norming = {
+let current_trial_reveal = "No";
+
+// Define the main approach-avoid block
+// 1. Define the separate stages
+const stage_1_decision = {
   type: jsPsychWyLabSurvey,
-  preamble: jsPsych.timelineVariable('prompt'),
-  questions: [
-    {
-      name: "familiarity_binary",
-      prompt: "Have you ever heard of this person?",
-      format: {
-        type: 'radio',
-        mc_orientation: 'horizontal'
-      },
-      options: ["Yes", "No"],
-      requirements: { type: 'request' }
-    },
-    {
-      name: "morality",
-      prompt: "How <strong>morally good or morally bad</strong> do you consider this person to be?",
-      format: {
-        type: 'slider',
-        slider_direction: "bipolar",
-        slider_starting_value: 50,
-        slider_range: [0, 100],
-        slider_color_scheme: "orange-purple",
-        slider_anchors: {
-          left: 'Extremely morally bad', 
-          center: 'Neutral',
-          right: 'Extremely morally good'
-        },
-      },
-      requirements: { type: 'request' }
-    },
-    {
-      name: "familiarity",
-      prompt: "How <strong>much do you know</strong> about this person?",
-      format: {
-        type: 'slider',
-        slider_direction: "unipolar",
-        slider_color_scheme: "purple",
-        slider_starting_value: 0,
-        slider_range: [0, 100],
-        slider_anchors: {
-          left: 'Nothing at all',
-          right: 'A lot'
-        },
-      },
-      requirements: { type: 'request' }
-    },
-    {
-      name: "uncertainty",
-      prompt: "How <strong>certain</strong> are you about what you will read next about this person?",
-      format: {
-        type: 'slider',
-        slider_direction: "unipolar",
-        slider_color_scheme: "purple",
-        slider_starting_value: 0,
-        slider_range: [0, 100],
-        slider_anchors: {
-          left: 'Not at all certain',
-          right: 'Extremely certain'
-        },
-      },
-      requirements: { type: 'request' }
-    },
-    {
-      name: "typicality",
-      prompt: "How <strong>typical</strong> do you consider this person to be?",
-      format: {
-        type: 'slider',
-        slider_direction: "unipolar",
-        slider_color_scheme: "purple",
-        slider_starting_value: 0,
-        slider_range: [0, 100],
-        slider_anchors: {
-          left: 'Not at all typical',
-          right: 'Extremely typical'
-        },
-      },
-      requirements: { type: 'request' }
-    },
-    {
-      name: "valence",
-      prompt: "How <strong>positively or negatively</strong> do you feel about this person?",
-      format: {
-        type: 'slider',
-        slider_direction: "bipolar",
-        slider_color_scheme: "orange-purple",
-        slider_starting_value: 50,
-        slider_range: [0, 100],
-        slider_anchors: {
-          left: 'Extremely negative', 
-          center: 'Neutral',
-          right: 'Extremely positive'
-        }
-      },
-      requirements: { type: 'request' }
-    },
-  ],
-  button_label: 'Next Page',
-  data: {
-    target_name: jsPsych.timelineVariable('target_name'),
-    target_morality: jsPsych.timelineVariable('target_morality')
-  },
+  preamble: jsPsych.timelineVariable('prompt_initial'),
+  questions: [{
+    name: "reveal_decision",
+    prompt: "<p>Would you like to reveal the full information about this person?</p>",
+    options: ["Yes", "No"],
+    format: { type: 'radio', mc_orientation: 'horizontal' },
+    requirements: { type: 'required' }
+  }],
   on_finish: function(data) {
-    norming_trial_count++;
-    data.norming_trial_number = norming_trial_count;
-    
-    data.familiarity_binary = data.response['familiarity_binary']?.toLowerCase() || null;
-    data.morality = data.response['morality'];
-    data.familiarity = data.response['familiarity'];
-    data.uncertainty = data.response['uncertainty'];
-    data.typicality = data.response['typicality'];
-    data.valence = data.response['valence'];
+    current_trial_reveal = data.response['reveal_decision'];
+    const choice = data.response['reveal_decision'];
+    jsPsych.data.addProperties({ current_reveal_choice: choice });
   }
 };
 
-const block_norming = {
-  timeline: [page_norming],
-  timeline_variables: participant_stimuli.map(stimulus => ({
-    prompt: `
-      <p>Please read about the person below and answer the following questions:</p>
-      <div class="norming-card aat-card active ${stimulus.morality === 'moral' ? 'norming-card-moral' : 'norming-card-immoral'}">
-        <div style="padding: 0 20px 0;">  
-          <h2><strong>${stimulus.name}</strong></h2>
-          <p>${stimulus.intro}</p>
+const stage_2_pre_questions = {
+  type: jsPsychWyLabSurvey,
+  preamble: jsPsych.timelineVariable('prompt_initial'),
+  questions: [
+    { 
+      name: "pre_trial_uncertainty", 
+      prompt: "<p>How much do you feel like you would <strong>learn</strong> about this person?</p>", 
+      options: ["1<br>Nothing at all", "2", "3", "4", "5", "6", "7<br>A lot"], 
+      format: { 
+        type: 'radio',
+        mc_orientation: 'horizontal'
+      }, 
+      requirements: { type: 'request' }
+    },
+    { 
+      name: "pre_trial_interest", 
+      prompt: "<p>How <strong>interesting</strong> do you think it would be to learn about this person?</p>", 
+      options: ["1<br>Not at all", "2", "3", "4", "5", "6", "7<br>Extremely"], 
+      format: { 
+        type: 'radio',
+        mc_orientation: 'horizontal'
+      }, 
+      requirements: { type: 'request' }
+    },
+    {
+      name: "pre_trial_valence", 
+      prompt: "<p>How likely is it that learning about this person would make you feel <strong>positively or negatively</strong>?</p>", 
+      options: ["1<br>Extremely negatively", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely positively"],
+      format: { 
+        type: 'radio',
+        mc_orientation: 'horizontal'
+      },
+      requirements: { type: 'request' }
+    }
+  ],
+  on_finish: function(data) {
+    switch (data.response['pre_trial_uncertainty']) {
+      case "1<br>Nothing at all":
+        data.pre_trial_uncertainty = 1;
+        break;
+      case "2":
+        data.pre_trial_uncertainty = 2;
+        break;
+      case "3":
+        data.pre_trial_uncertainty = 3;
+        break;
+      case "4":
+        data.pre_trial_uncertainty = 4;
+        break;
+      case "5":
+        data.pre_trial_uncertainty = 5;
+        break;
+      case "6":
+        data.pre_trial_uncertainty = 6;
+        break;
+      case "7<br>Completely":
+        data.pre_trial_uncertainty = 7;
+        break;
+    };
+    jsPsych.data.addProperties({
+      pre_trial_uncertainty: data.pre_trial_uncertainty || null
+    })
+  }
+};
+
+const stage_3_post_reveal = {
+  type: jsPsychWyLabSurvey,
+  preamble: function() {
+    // Check the decision made in Stage 1
+    const stimulus = jsPsych.evaluateTimelineVariable('stimulus_data');
+
+    // 3. Determine the CSS class
+    const blur_switch = (current_trial_reveal === "Yes") ? "" : "faded-text";
+    const decision_text = (current_trial_reveal === "Yes") ? "reveal" : "skip";
+
+    return `
+      <p>You decided to <strong>${decision_text}</strong> the full information about this person.
+        <br>Please answer the following questions given the information below:
+      </p>
+      <div class="norming-card aat-card active norming-card-${stimulus.morality}">
+        <h2>${stimulus.name}</h2>
+        <p>${stimulus.intro}</p>
+        <div class="${blur_switch}">
+          <p>${stimulus.description}</p>
+          <p>${stimulus.motive}</p>
         </div>
+      </div>`;
+  },
+  questions: [
+    { 
+      name: "morality", 
+      prompt: "<p>How positively or negatively does reading this information make you feel about this person?</p>", 
+      options: ["1<br>Extremely negatively", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely positively"], 
+      format: { 
+        type: 'radio',
+        mc_orientation: 'horizontal'
+      } 
+    }
+  ]
+};
+
+// 2. Assemble the main block
+const block_approach_avoid = {
+  timeline: [
+    {
+      // Sub-timeline for Stage 1 & 2 to allow randomization
+      timeline: jsPsych.randomization.shuffle([stage_1_decision, stage_2_pre_questions]),
+    },
+    stage_3_post_reveal // Always happens last
+  ],
+  timeline_variables: participant_stimuli.map(stimulus => ({
+    // Pass the raw data so the functions can access it
+    stimulus_data: stimulus, 
+    prompt_initial: `
+      <div class="norming-card aat-card active norming-card-${stimulus.morality}">
+        <h2>${stimulus.name}</h2>
+        <p>${stimulus.intro}</p>
         <div class="faded-text">
           <p>${stimulus.description}</p>
           <p>${stimulus.motive}</p>
         </div>
-      </div>`,
-    target_name: stimulus.name,
-    target_morality: stimulus.morality
+      </div>`
   })),
   randomize_order: true
 };
 
-// ---------------- PAGE 5 ---------------- //
+
+
+
+// ---------------- PAGE 6 ---------------- //
 // DEMOGRAPHICS
 const block_fiction_question = {
   type: jsPsychWyLabSurvey,
@@ -586,7 +641,46 @@ const block_fiction_question = {
   }
 };
 
-// ---------------- PAGE 6 ---------------- //
+// ---------------- PAGE 7 ---------------- //
+// POST-TASK
+const block_post_task = {
+  type: jsPsychWyLabSurvey,
+  preamble: `
+    <p class="jspsych-survey-multi-choice-preamble">
+      Now that you have completed the main task, please respond to the following questions:
+    </p>`,
+  questions: [
+    {
+      prompt: "To what extent do you agree that most people in the world lead lives that are <strong>morally good?</strong>",
+      name: 'post_worldview',
+      options: ["1<br>Strongly disagree", "2", "3", "4<br>Neutral", "5", "6", "7<br>Strongly agree"],
+      format: {
+        type: 'radio',
+        mc_orientation: 'horizontal'
+      },
+      requirements: { type: 'request' }
+    },
+    {
+      prompt: "How positive or negative do you feel?",
+      name: 'post_valence',
+      options: ["1<br>Strongly negative", "2", "3", "4<br>Neutral", "5", "6", "7<br>Strongly positive"],
+      format: {
+        type: 'radio',
+        mc_orientation: 'horizontal'
+      },
+      requirements: { type: 'request' }
+    }
+  ],
+  button_label: 'Next Page',
+  on_finish: function(data) {
+    jsPsych.data.addProperties({
+      post_worldview: data.response['post_worldview'],
+      post_valence: data.response['post_valence']
+    });
+  }
+};
+
+// ---------------- PAGE 8 ---------------- //
 // DEMOGRAPHICS
 const block_demographics_questions = {
   type: jsPsychWyLabSurvey,
@@ -683,6 +777,8 @@ const block_demographics_questions = {
   }
 };
 
+// ---------------- PAGE 9 ---------------- //
+// ATTENTION CHECK
 const block_attention = {
   type: jsPsychWyLabSurvey,
   preamble: `
@@ -732,7 +828,8 @@ const block_attention = {
   }
 };
   
-
+// ---------------- PAGE 10 ---------------- //
+// DEBRIEFING
 const block_debrief = {
   type: jsPsychWyLabSurvey,
   preamble: `
@@ -771,7 +868,7 @@ const block_debrief = {
   questions: []
 };
 
-// ---------------- PAGE 7 ---------------- //
+// ---------------- PAGE 11 ---------------- //
 // COMMENTS AND FEEDBACK
 const block_feedback = {
   type: jsPsychWyLabSurvey,
@@ -798,7 +895,6 @@ const block_feedback = {
     });
   }
 };
-
 
 // ---------------- END EXPERIMENT ---------------- //
 // EXIT FULLSCREEN
@@ -851,12 +947,11 @@ startExperiment();
 
 
 
-/////
 // 2. Create the "Real" experiment procedure
 const survey_flow = {
   timeline: [
     // block_instructions, 
-    block_comprehension_check, 
+    // block_comprehension_check, 
     block_approach_avoid,
     block_fiction_question,
     block_demographics_questions, 
