@@ -75,6 +75,7 @@ a {
   padding: 2px 5px 2px;
   border-radius: 5px;
   background: #EEEEEE;
+  white-space: nowrap;
   &:hover {
     background-color: #DDDDDD;
     color: black;
@@ -363,7 +364,6 @@ blockquote {
 /* --- NEW: Wrapper for absolute positioning --- */
 #aat-experiment-wrapper {
   position: relative;
-  /* Define size based on the card size */
   width: 500px;
 }
 
@@ -487,119 +487,6 @@ blockquote {
 }
 
 
-
-/*
-.aat-button {
-  --btn-color: #888;
-
-  font-weight: 600;
-  flex-grow: 1;
-  margin: 0 25px;
-  padding: 15px 30px;
-  font-size: 16px;
-  text-transform: uppercase;
-  border: none;
-  border-radius: 15px;
-  color: white;
-  cursor: pointer;
-
-  background-color: var(--btn-color);
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    animation: pop-up 0.3s ease forwards;
-    box-shadow: 0 0.25em 0.25em -0.1em var(--btn-color);
-    transform: translateY(-0.25em);
-    border-color: var(--btn-color);
-  }
-}
-
-.aat-button-yes {
-  --btn-color: #28a745;
-}
-
-.aat-button-no {
-  --btn-color: #dc3545;
-}
-*/
-
-
-
-
-
-
-
-/* Button Main Style */
-.aat-button {
-  cursor: pointer;
-  margin-left: 5px;
-  margin-bottom: 15px;
-  text-shadow: 0 -2px 0 darken(#7fbb98, 20%), 0 1px 1px lighten(#7fbb98, 20%);
-  box-sizing: border-box;
-  text-decoration: none;
-  font-weight: bold;
-  color: #64a37e;
-  height: 65px;
-  line-height: 65px;
-  padding: 0 32.5px;
-  display: inline-block;
-  width: auto;
-  background: linear-gradient(to bottom, #7fbb98 0%, #99d7b4 26%, #7fbb98 100%);
-  border-radius: 5px;
-  border-top: 1px solid #c9e8d6;
-  border-bottom: 1px solid #c2e5d1;
-  border-left: none;
-  border-right: none;
-  top: 0;
-  transition: all 0.06s ease-out;
-  position: relative;
-}
-
-.aat-button:visited {
-  color: #64a37e;
-}
-
-.aat-button:hover {
-  /* Applied 7% lighten to the gradient colors */
-  background: linear-gradient(to bottom, #c6f0d8 0%, #b8e3cc 26%, #9fd0b4 100%);
-}
-
-.aat-button:active {
-  top: 6px;
-  text-shadow: 0 -2px 0 #7fbb98, 0 1px 1px #bce2cc, 0 0 4px white;
-  color: #ebf6f0;
-}
-
-/* 3D Depth Effect (Shadow) */
-.aat-button:before {
-  display: inline-block;
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  z-index: -1;
-  top: 6px;
-  border-radius: 5px;
-  height: 65px;
-  background: linear-gradient(to top, #1e3929 0%, #3d7153 6px);
-  transition: all 0.078s ease-out;
-  box-shadow: 0 1px 0 2px rgba(0, 0, 0, 0.3), 
-              0 5px 2.4px rgba(0, 0, 0, 0.5), 
-              0 10.8px 9px rgba(0, 0, 0, 0.2);
-}
-
-/* Move shadow when button is pressed */
-.aat-button:active:before {
-  top: 0;
-  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.7), 0 3px 9px rgba(0, 0, 0, 0.2);
-}
-
-
-
-
-
-
-
 .faded-text {
   /* Apply a gradient mask to fade out the bottom */
   padding: 0 20px 0;
@@ -620,8 +507,6 @@ blockquote {
   );
   filter: blur(2px);
 }
-
-
 
 
 .jspsych-survey-html-form {
@@ -693,11 +578,24 @@ input[type="range"] {
     margin: 0;
 }
 
-/* Number Options */
+/* Number Entry Options */
 input[type="number"] {
   font-size: 10pt;
   padding: 5px;
   height: 30px;
+  cursor: pointer;
+}
+
+/* Multiple Choice Options */
+input[type="radio" i],
+input[type="checkbox" i] {
+  align-self: center;
+  flex-shrink: 0;
+  height: 1rem;
+  width: 1rem;
+  opacity: 0;
+  position: absolute;
+  visibility: visible !important;
   cursor: pointer;
 }
 
@@ -787,19 +685,6 @@ input[type="number"] {
   &:focus-within {
     border: 2.5px solid #0070e0;
   }
-}
-
-/* Multiple Choice Options */
-input[type="radio" i],
-input[type="checkbox" i] {
-  align-self: center;
-  flex-shrink: 0;
-  height: 1rem;
-  width: 1rem;
-  opacity: 0;
-  position: absolute;
-  visibility: visible !important;
-  cursor: pointer;
 }
 
 
@@ -907,10 +792,19 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
 }
 
 /* Slider Track */
-.jspsych-slider::-webkit-slider-runnable-track,
+.jspsych-slider::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #eee;
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border-radius: 2px;
+  border: 1px solid #aaa;
+}
+
 .jspsych-slider::-moz-range-track {
   appearance: none;
-  -webkit-appearance: none;
   width: 100%;
   height: 8px;
   cursor: pointer;

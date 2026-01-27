@@ -63,7 +63,6 @@ jsPsych.data.addProperties({
 // ---------------- PAGE 1 ---------------- //
 // BROWSER CHECK
 const block_browser_check = { type: browserCheck };
-
 const block_captcha = {
   type: jsPsychWyLabSurvey,
   name: 'captcha',
@@ -71,20 +70,46 @@ const block_captcha = {
     <p class="jspsych-survey-multi-choice-preamble">
       To ensure that you are a human participant, please select the option "I am human" below:
     </p>
-    <div id="recaptcha-container" class="g-recaptcha-enterprise" 
-         data-sitekey="6LfBRVAsAAAAAB7bci0_0TlzXC5Bv8vgZg2R7s_a" 
-         data-action="LOGIN"></div>
-    `,
+    <div id="recaptcha-container"></div>
+    
+    <button id="custom-next-btn" class="jspsych-btn" style="margin-top: 20px;">Continue</button>
+    
+    <style>
+      /* Hide the plugin's original button to prevent bypass */
+      .jspsych-survey-html-form-next, .jspsych-btn:not(#custom-next-btn) { 
+        display: none !important; 
+      }
+    </style>
+  `,
   questions: [],
-  on_load: function() {
-    // Check if grecaptcha is loaded and then manually render it
+  on_load: function() { 
+    let captchaToken = null;
+    const warning = document.getElementById('captcha-warning');
+    const customBtn = document.getElementById('custom-next-btn');
+
+    // 1. Initialize CAPTCHA
     if (window.grecaptcha && window.grecaptcha.enterprise) {
-      grecaptcha.enterprise.render('recaptcha-container');
+      grecaptcha.enterprise.render('recaptcha-container', {
+        'sitekey': '6LfBRVAsAAAAAB7bci0_0TlzXC5Bv8vgZg2R7s_a',
+        'callback': function(token) {
+          captchaToken = token;
+          if (warning) warning.style.display = 'none';
+        }
+      });
     }
-  },
-  on_finish: function(data) {
-  // Capture the token so it appears in your CSV/JSON output
-    data.captcha_token = grecaptcha.enterprise.getResponse();
+
+    // 2. Handle the manual button click
+    customBtn.addEventListener('click', function() {
+      if (!captchaToken) {
+        alert("Please complete the CAPTCHA to proceed.");
+      } else {
+        // SUCCESS: Pass the data directly into finishTrial
+        // This avoids calling getCurrentTrial() which was causing the 'undefined' error
+        jsPsych.finishTrial({
+          captcha_token: captchaToken
+        }); 
+      }
+    });
   }
 };
 
@@ -95,7 +120,7 @@ const block_enter_fullscreen = {
   fullscreen_mode: true,
   delay_after: 0
 };
-timeline.push([block_browser_check,block_enter_fullscreen]);
+timeline.push([block_browser_check, block_captcha, block_enter_fullscreen]);
 
 // ---------------- PAGE 2 ---------------- // 
 // CONSENT FORM
@@ -193,9 +218,9 @@ const block_consent_form = {
       <p class="indented align-left">
         The main researcher conducting this study is Jordan Wylie, a professor at Cornell University. 
         Please ask any questions you have now. If you have questions later, you may contact Professor 
-        Jordan Wylie <a href="mailto:jordan.wylie@cornell.edu"><i class="fa-solid fa-envelope fa-xs"></i>&nbsp;jordan.wylie@cornell.edu</a>&nbsp;or <a href="tel:16072554486"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255&nbsp;4486</a>. If you have any questions or concerns regarding 
+        Jordan Wylie <a href="mailto:jordan.wylie@cornell.edu"><i class="fa-solid fa-envelope fa-xs"></i>&nbsp;jordan.wylie@cornell.edu</a>&nbsp;or <a href="tel:16072554486"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255&ndash;4486</a>. If you have any questions or concerns regarding 
         our rights as a subject in this study, you may contact the Institutional Review Board (IRB) for 
-        Human Participants <a href="tel:16072556182"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255&nbsp;6182</a> or access their 
+        Human Participants <a href="tel:16072556182"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255&ndash;6182</a> or access their 
         website <a href="https://researchservices.cornell.edu/offices/IRB" rel="noopener" target="_blank">researchservices.cornell.edu/offices/IRB&nbsp;<i class="fa-solid fa-arrow-up-right-from-square fa-xs"></i></a>. 
         You may also report your concerns or complaints anonymously online via 
         NAVEX <a href="http://www.hotline.cornell.edu" rel="noopener" target="_blank">hotline.cornell.edu&nbsp;<i class="fa-solid fa-external-link fa-xs"></i></a>
@@ -862,7 +887,7 @@ const block_debrief = {
       <h3><i class="fa fa-2xs fa-chevron-circle-down"></i>&nbsp;<strong>To learn more about your rights as a research participant</strong></h3>
       <p class="indented align-left">
         If you have any concerns about research-related ethics or harm, or would like to learn more about the ethical constraints under which this study was conducted, 
-        please contact the Cornell University Institutional Review Board (IRB) for Human Participants <a href="tel:16072556182"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255-6182</a> or access their website <a href="https://researchservices.cornell.edu/offices/IRB" target="_blank">researchservices.cornell.edu/offices/IRB&nbsp;<i class="fa-solid fa-external-link fa-xs"></i></a>. Thank you for your participation!
+        please contact the Cornell University Institutional Review Board (IRB) for Human Participants <a href="tel:16072556182"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255&ndash;6182</a> or access their website <a href="https://researchservices.cornell.edu/offices/IRB" target="_blank">researchservices.cornell.edu/offices/IRB&nbsp;<i class="fa-solid fa-external-link fa-xs"></i></a>. Thank you for your participation!
       </p>
     </section>`,
   questions: []
