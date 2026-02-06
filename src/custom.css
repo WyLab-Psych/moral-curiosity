@@ -382,11 +382,11 @@ blockquote {
   width: 500px;
 }
 
-.norming-card-moral {
+.norming-card-blue {
   box-shadow: 0px 0px 12px rgb(13, 110, 237);
 }
 
-.norming-card-immoral {
+.norming-card-red {
   box-shadow: 0px 0px 12px rgb(224, 18, 18);
 }
 
@@ -966,7 +966,7 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   background-color: #4caf50;
   width: 0%;
   height: 100%;
-  border-radius: 4px 0px 0px 4px;
+  border-radius: 4px;
 }
 
 /* Control appearance of jsPsych.data.displayData() */

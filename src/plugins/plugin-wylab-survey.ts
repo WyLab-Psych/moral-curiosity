@@ -219,7 +219,6 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
               ${question_requirements}>
           `;
         
-        
           // SHORT TEXT INPUT
         } else if (question_format == "short_response") {
           const short_text = question.format;
