@@ -6,7 +6,7 @@
 // HOW do we deconfound effort from avoiding?
 // one way is we can show something else when they avoid -- like a neutral image or something filler.
 // this is a strong test of avoid
-import stimuli from '../stimuli/norming-targets.json' with { type: 'json' }
+import stimuli from '../stimuli/study2-targets.json' with { type: 'json' }
 
 // Import FontAwesome icons
 import { library, dom } from '@fortawesome/fontawesome-svg-core'
@@ -50,19 +50,16 @@ const session_id = jsPsych.data.getURLVariable('SESSION_ID');
 const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
 const prolific_completion_code = "C1DCBGN4";
 const completion_time = 10;  // in minutes
-
 const pre_order = jsPsych.randomization.sampleWithoutReplacement(["worldview_first", "motives_first"], 1)[0];
 const post_order = pre_order;
-
 const approach_avoid_responses = jsPsych.randomization.shuffle(["Yes", "No"]);
-
 const moral_color = jsPsych.randomization.sampleWithoutReplacement(["blue", "red"], 1)[0];
 const immoral_color = (moral_color === "blue") ? "red" : "blue";
 
 jsPsych.data.addProperties({
   participant_id: participant_id,
   study_id: study_id,
-  session_id: session_id
+  session_id: session_id,
 });
 
 // ---------------- PAGE 1 ---------------- //
@@ -108,8 +105,6 @@ const block_captcha = {
       if (!captchaToken) {
         alert("Please complete the CAPTCHA to proceed.");
       } else {
-        // SUCCESS: Pass the data directly into finishTrial
-        // This avoids calling getCurrentTrial() which was causing the 'undefined' error
         jsPsych.finishTrial({
           captcha_token: captchaToken
         }); 
@@ -121,9 +116,7 @@ const block_captcha = {
 const block_botcheck = {
   type: jsPsychWyLabSurvey,
   name: 'bot_check_tiger',
-  preamble: `
-  
-  `,
+  preamble: ``,
   questions: [
     {
       name: 'botcheck_response',
@@ -318,7 +311,7 @@ const instruction_pages = [
 
   // 4. Study Design
   `<p class="align-left">
-    You will be asked to answer questions about a total of <strong>20 people.</strong> Please read each description carefully, and answer as honestly as possible.
+    You will be asked to answer questions about a total of <strong>10 people.</strong> Please read each description carefully, and answer as honestly as possible.
   </p>`,
 
   // 5. Pre-/Post-Questions
@@ -406,110 +399,38 @@ const block_pre_task = {
   }
 };
 
-// STUDY INSTRUCTIONS
-// const block_comprehension_check = {
-//   type: jsPsychWyLabSurvey,
-//   preamble: `
-//     <main>
-//       <div class="jspsych-instructions">
-//         <h2>Review</h2>
-        
-//         <p>Great, let's review what you just read.</p> 
-
-//         <p>Please answer the following questions to the best of your ability.</p>
-//       </div>
-//     </main>`,
-//   questions: [
-//     {
-//       name: 'comprehension_check_1',
-//       prompt: 'How many people will you be asked to read about in this study?',
-//       format: { type: 'radio' },
-//       options: [
-//         "Read descriptions of historical figures and answer questions about them",
-//         "Watch videos and answer questions about them",
-//         "Complete puzzles and answer questions about them"
-//       ],
-//       feedback: [
-//         "Yes, that's right! You will read about historical figures.",
-//         "No, that's not correct. Please try again.",
-//         "No, that's not correct. Please try again.",
-//       ],
-//       requirements: {
-//         type: 'comprehension',
-//         correct_answer: 'Read descriptions of historical figures and answer questions about them',
-//       }
-//     },
-//     {
-//       name: 'comprehension_check_2',
-//       prompt: 'What will you be asked to do in this study?',
-//       format: { type: 'radio' },
-//       options: [
-//         "Read descriptions of historical figures and answer questions about them",
-//         "Watch videos and answer questions about them",
-//         "Complete puzzles and answer questions about them"
-//       ],
-//       feedback: [
-//         "Yes, that's right! You will read about historical figures.",
-//         "No, that's not correct. Please try again.",
-//         "No, that's not correct. Please try again.",
-//       ],
-//       requirements: {
-//         type: 'comprehension',
-//         correct_answer: 'Read descriptions of historical figures and answer questions about them',
-//       }
-//     },
-//     {
-//       name: 'comprehension_check_3',
-//       prompt: 'What will you be asked to do in this study?',
-//       format: { type: 'radio' },
-//       options: [
-//         "Read descriptions of historical figures and answer questions about them",
-//         "Watch videos and answer questions about them",
-//         "Complete puzzles and answer questions about them"
-//       ],
-//       feedback: [
-//         "Yes, that's right! You will read about historical figures.",
-//         "No, that's not correct. Please try again.",
-//         "No, that's not correct. Please try again.",
-//       ],
-//       requirements: {
-//         type: 'comprehension',
-//         correct_answer: 'Read descriptions of historical figures and answer questions about them',
-//       }
-//     }
-//   ],
-//   button_label: 'Next Page'
-// };
-
-
 // ---------------- PAGE 5+ ---------------- //
 // NORMING TASK
-const main_task_stimuli = stimuli
-
-const moral_pool = main_task_stimuli.filter(s => s.morality === 'moral');
-const immoral_pool = main_task_stimuli.filter(s => s.morality === 'immoral');
-
-const selected_moral = jsPsych.randomization.sampleWithoutReplacement(moral_pool, 5);
-const selected_immoral = jsPsych.randomization.sampleWithoutReplacement(immoral_pool, 5);
-
-// Combine and shuffle for the individual participant
-const participant_stimuli = jsPsych.randomization.shuffle([...selected_moral, ...selected_immoral]);
+const task_stimuli = jsPsych.randomization.shuffle(stimuli);
+const task_stimuli_names = task_stimuli.map(s => s.name);
 let norming_trial_count = 0; // Initialize at 0
 
-const shuffledPairs = jsPsych.randomization.shuffle([
-  ["...wanted to <strong>clear up what I don't know.</strong>", "...didn't want to <strong>clear up what I don't know.</strong>"],
-  ["...thought it would be <strong>useful or helpful to me.</strong>", "...didn't think it would be <strong>useful or helpful to me.</strong>"],
-  ["...thought it would be <strong>fun or interesting.</strong>", "...didn't think it would be <strong>fun or interesting.</strong>"],
-  ["...thought it would make me <strong>feel good.</strong>", "...didn't think it would make me <strong>feel good.</strong>"],
-  ["...thought it would help me <strong>better relate to people like this.</strong>", "...didn't think it would help me <strong>better relate to people like this.</strong>"],
-  ["...thought it would help me <strong>better understand people like this.</strong>", "...didn't think it would help me <strong>better understand people like this.</strong>"]
-]);
+jsPsych.data.addProperties({
+  stimuli_order: task_stimuli_names
+});
 
-const approach_motives = shuffledPairs.map(pair => pair[0]);
-const avoid_motives = shuffledPairs.map(pair => pair[1]);
+console.log(task_stimuli)
+
+// 1. Define your motives with shorthand labels
+const motiveData = [
+  { id: 'certainty', text: "...fill in gaps in my knowledge about people like this." },
+  { id: 'cognitive_mental', text: "...help me understand what is going on in the minds of people like this." },
+  { id: 'cognitive_context', text: "...help me understand the life experiences that lead people to become like this." },
+  { id: 'instrumental', text: "...be useful or helpful to me." },
+  { id: 'hedonic_affect', text: "...make me feel." },
+  { id: 'hedonic_fun', text: "...be fun or interesting to learn about." },
+  { id: 'social', text: "...help me understand how I relate or compare to people like this." }
+];
+
+// 2. Shuffle the entire objects
+const shuffledMotives = jsPsych.randomization.shuffle(motiveData);
+
+// 3. Extract the parts you need
+const motives_text = shuffledMotives.map(m => m.text);
+const motives_names = shuffledMotives.map(m => m.id);
 
 const block_approach_avoid = {
-  timeline: participant_stimuli.map(stimulus => {
+  timeline: task_stimuli.map(stimulus => {
     // This variable is shared by the 3 stages below for THIS stimulus
     let trial_decision = null;
     let prompt_initial = `
@@ -526,6 +447,47 @@ const block_approach_avoid = {
 
     const page1 = {
       type: jsPsychWyLabSurvey,
+      // We use a function for preamble so it checks 'current_decision' AFTER stage 1 finishes
+      preamble: prompt_initial,
+      questions: [{
+        name: "pre_trial_motive",
+        prompt() {
+          const page2_html = `
+            <section>
+              <p>
+                Based on what you can read about this person here, 
+                how <em>much</em> do each of the following <strong>considerations factor 
+                into your decision</strong> about whether or not you would like to <strong>learn more?</strong>
+              </p>
+              <p style="font-size: 18pt;">How the information would:</p>
+            </section>`;
+          return page2_html;
+        },
+        options: motives_text,
+        format: { 
+          type: 'matrix',
+          names: motives_names,
+          labels: ["<span style='font-size: 10pt;'>Not at all</span><br>1", "2", "3", "4", "5", "6", "<span style='font-size: 10pt;'>A great deal</span><br>7"],
+          values: [1, 2, 3, 4, 5, 6, 7]
+        },
+        requirements: { type: 'request' }
+      }],
+      on_finish(data) {
+        data.stimulus_name = stimulus.name;
+        data.stimulus_morality = stimulus.morality;
+        data.pretrial_motive_order = motives_names;
+        data.pretrial_motive_certainty = data.response['pre_trial_motive_certainty'] || null;
+        data.pretrial_motive_cognitive_mental = data.response['pre_trial_motive_cognitive_mental'] || null;
+        data.pretrial_motive_cognitive_context = data.response['pre_trial_motive_cognitive_context'] || null;
+        data.pretrial_motive_instrumental = data.response['pre_trial_motive_instrumental'] || null;
+        data.pretrial_motive_hedonic_affect = data.response['pre_trial_motive_hedonic_affect'] || null;
+        data.pretrial_motive_hedonic_fun = data.response['pre_trial_motive_hedonic_fun'] || null;
+        data.pretrial_motive_social = data.response['pre_trial_motive_social'] || null;
+      }
+    };
+
+    const page2 = {
+      type: jsPsychWyLabSurvey,
       preamble: prompt_initial,
       questions: [{
         name: "trial_decision",
@@ -535,50 +497,19 @@ const block_approach_avoid = {
         requirements: { type: 'required' }
       }],
       on_finish(data) {
-        trial_decision = data.response['trial_decision'] === "Yes" ? "yes" : "no";
-        data.trial_decision = trial_decision;
+        trial_decision = data.response['trial_decision'];
+        data.trial_decision = data.response['trial_decision'] === "Yes" ? "yes" : "no";
       }
-    };
-
-    const page2 = {
-      type: jsPsychWyLabSurvey,
-      // We use a function for preamble so it checks 'current_decision' AFTER stage 1 finishes
-      preamble: prompt_initial,
-      questions: [{
-        name: "pre_trial_motive",
-        prompt() {
-          const decision_text = (trial_decision === "yes") ? "show" : "skip";
-          const prompt_text = (trial_decision === "yes") ? "wanted" : "didn't want";
-          const page2_html = `
-            <section>
-              <p style="font-size: 18pt;">You decided to <strong>${decision_text}</strong> the full information about this person.</p>
-              <p>
-                Which of the following motive(s), if any, explain your decision<br>to <strong><u>${decision_text}</u></strong> the full information about this person? Please select all that apply.
-              </p>
-              <p style="font-size: 18pt;">
-                I ${prompt_text} to learn more because I&hellip;
-              </p>
-            </section>`;
-          return page2_html;
-        },
-        options() {
-          const decision_text = (trial_decision === "yes") ? "show" : "skip";
-          if (trial_decision === "yes") {
-            return approach_motives
-          } else if (trial_decision === "no") {
-            return avoid_motives;
-          }
-        },
-        format: { type: 'checkbox', mc_orientation: 'vertical' },
-        requirements: { type: 'none' }
-      }]
     };
 
     const page3 = {
       type: jsPsychWyLabSurvey,
-      preamble() {
-        const blur_switch = (trial_decision === "yes") ? "" : "faded-text";
-        const decision_text = (trial_decision === "yes") ? "show" : "skip";
+      preamble: function() {
+        // This function runs AFTER page2 finishes
+        const isShow = (trial_decision === "Yes");
+        const blur_switch = isShow ? "" : "faded-text";
+        const decision_text = isShow ? "show" : "skip";
+
         const page3_html = `
           <section>
             <div class="norming-card aat-card active norming-card-${stimulus.morality === "moral" ? moral_color : immoral_color}">
@@ -609,8 +540,16 @@ const block_approach_avoid = {
           requirements: { type: 'request' }
         }
       ],
+      on_finish(data) {
+        // Record post-trial responses
+        data.posttrial_affect = data.response['post_trial_affect'] || null;
+        data.posttrial_interest = data.response['post_trial_interest'] || null;
+        
+        // Increment and assign trial number
+        norming_trial_count += 1;
+        data.trial_number = norming_trial_count;
+      }
     };
-
     return { timeline: [page1, page2, page3] };
   })
 };
@@ -647,10 +586,8 @@ const block_post_task = {
   },
   button_label: 'Next Page',
   on_finish(data) {
-    jsPsych.data.addProperties({
-      post_worldview: data.response['post_worldview'][0],
-      post_motives: data.response['post_motives'][0]
-    });
+    data.post_worldview = data.response['post_worldview'][0];
+    data.post_motives = data.response['post_motives'][0];
   }
 };
 
@@ -774,12 +711,12 @@ const block_demographics_questions = {
   button_label: 'Next Page',
   on_finish(data) {
     jsPsych.data.addProperties({
-      age: data.response['age'],
-      gender: data.response['gender'],
-      gender_writein: data.response['gender-writein'] || '',
-      politics: data.response['politics'],
-      race_ethnicity: Array.isArray(data.response['race-ethnicity']) ? data.response['race-ethnicity'].join(", ") : data.response['race-ethnicity'],
-      religion: data.response['religion']
+      age: data.response['age'] || null,
+      gender: data.response['gender'] || null,
+      gender_writein: data.response['gender-writein'] || null,
+      politics: data.response['politics'] || null,
+      race_ethnicity: Array.isArray(data.response['race-ethnicity']) ? data.response['race-ethnicity'].join(", ") : data.response['race-ethnicity'] || null,
+      religion: data.response['religion'] || null
     });
   }
 };
@@ -870,9 +807,7 @@ const block_feedback = {
       prompt:
         `<p class="jspsych-survey-multi-choice-question">
           Please use this space for any additional thoughts or comments.<br>
-          <span style="font-size: 10pt;">
-            We read everything and appreciate your feedback!
-          </span>
+          <span style="font-size: 10pt;">We read everything and appreciate your feedback!</span>
         </p>`,
     }
   ],
@@ -895,7 +830,7 @@ const block_exit_fullscreen = {
 const block_save_data = {
   type: jsPsychPipe,
   action: "save",
-  experiment_id: "RzZhZYnwuCi2",
+  experiment_id: "lgb8FqT4eANO",
   filename: filename,
   data_string: () => jsPsych.data.get().csv(),
   on_load() {
@@ -935,8 +870,7 @@ const block_redirect = {
 const survey_flow = {
   timeline: [
     block_botcheck,
-    // block_instructions, 
-    // block_comprehension_check,
+    block_instructions, 
     block_pre_task,
     block_approach_avoid,
     block_post_task,

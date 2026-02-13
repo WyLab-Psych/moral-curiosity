@@ -7,6 +7,7 @@
   --slider-mid: #DDDDDD;
   --slider-end: #785ef0;
   --deactivated-color: #888888;
+  --colors-primary-for-selected: #deecf9;
   /* --aat-button-height:65;
 $depth:6;
 $color:#7fbb98;
@@ -106,7 +107,7 @@ a {
 .grid-container-wrapper {
   display: flex; 
   justify-content: center; 
-  align-items: center; 
+  align-items: start; 
   margin: 50px 0 100px 0; 
 }
 
@@ -513,7 +514,7 @@ blockquote {
   display: flex;
   flex-direction: column;
   text-align: left;
-  gap: 48px;
+  gap: 36px;
   max-width: 50em !important;
 }
 
@@ -606,18 +607,27 @@ input[type="checkbox" i] {
   max-width: fit-content;
 }
 
-.jspsych-survey-html-form-options-container-horizontal {
+.matrix-scale-points-items, .matrix-labels-items, .matrix-statement-items {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(var(--option-count), 1fr);
   gap: .625rem;
+  align-self: center;
+  height: 90%;
 }
 
-@media (min-width: 30rem) {
-  .jspsych-survey-html-form-options-container-horizontal {
+.matrix-scale-points-items {
+  justify-items: center;
+  justify-self: end;
+  align-items: end;
+  text-align: center;
+}
+
+/* @media (min-width: 30rem) {
+  .matrix-scale-points-items, .matrix-labels-items, .matrix-statement-items {
     grid-template-columns: repeat(var(--option-count), 1fr);
     width: 100%;
   }
-}
+} */
 
 .jspsych-survey-html-form-radio-option-vertical,
 .jspsych-survey-html-form-checkbox-option-vertical {
@@ -730,7 +740,11 @@ input[type="checkbox" i] {
   width: 105%;
 }
 
-/* 3. Style when the parent label is 'selected' (after click) */
+.grid-cell.selected {
+  border-radius: 15%;
+}
+
+.grid-cell.selected,
 .jspsych-survey-html-form-radio-option-horizontal.selected,
 .jspsych-survey-html-form-radio-option-vertical.selected,
 label.jspsych-survey-html-form-checkbox-option-horizontal.selected,
@@ -738,6 +752,7 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   background-color: #DEECF9; /* Light blue background */
 }
 
+.grid-cell.selected .radio-button,
 .jspsych-survey-html-form-radio-option-horizontal.selected .radio-button,
 .jspsych-survey-html-form-radio-option-vertical.selected .radio-button,
 .jspsych-survey-html-form-checkbox-option-horizontal.selected .checkbox-button,
@@ -747,6 +762,7 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
 }
 
 /* 4. Show the checkmark and make its path white when selected */
+.grid-cell.selected .checkmark-svg,
 .jspsych-survey-html-form-radio-option-horizontal.selected .checkmark-svg,
 .jspsych-survey-html-form-radio-option-vertical.selected .checkmark-svg,
 .jspsych-survey-html-form-checkbox-option-horizontal.selected .checkmark-svg,
@@ -754,6 +770,7 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
     display: block; /* Show the SVG */
 }
 
+.grid-cell.selected .checkmark-svg svg path,
 .jspsych-survey-html-form-radio-option-horizontal.selected .checkmark-svg svg path,
 .jspsych-survey-html-form-radio-option-vertical.selected .checkmark-svg svg path,
 .jspsych-survey-html-form-checkbox-option-horizontal.selected .checkmark-svg svg path,
@@ -1038,4 +1055,145 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   opacity: 1;
   border-left: 3px solid #007bff; /* Optional: highlight the new part */
   padding-left: 15px;
+}
+
+
+/* Container & Grid Logic */
+.jspsych-survey-html-form-matrix-container {
+  display: grid;
+  grid-template-columns: minmax(6.25rem, 23%) 1fr;
+  grid-auto-rows: 1fr;
+}
+
+.matrix-scale-points-items, 
+.matrix-statement-items {
+  display: grid;
+  grid-template-columns: repeat(var(--option-count), 1fr);
+  column-gap: 10px;
+  width: 100%;
+}
+
+.jspsych-survey-html-form-matrix-row {
+    display: contents; /* Essential for grid child alignment */
+}
+
+.jspsych-survey-html-form-matrix-row-label {
+    grid-column: 1;
+    font-size: 10pt;
+    text-align: left;
+    padding: 10px 0;
+    align-self: center;
+}
+
+/* Highlight for regular (non-matrix) options */
+.jspsych-survey-html-form-radio-option-vertical.selected,
+.jspsych-survey-html-form-checkbox-option-vertical.selected {
+    background-color: #DEECF9;
+}
+
+
+
+
+.jspsych-survey-html-form-matrix-row-checkbox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+/* Ensure the grid cell is a flex container */
+.grid-cell {
+    display: flex;
+    justify-content: center;
+    align-items: stretch; /* Allows the label to fill the height */
+    width: 100%;
+}
+
+/* Make the label the full-size clickable area */
+.grid-cell-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%; /* Spans the full height of the row */
+    cursor: pointer;
+}
+
+/* Ensure the input container doesn't block the click */
+.grid-cell-input {
+    pointer-events: none; /* Let clicks 'pass through' to the label */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Re-enable pointer events ONLY for the hidden radio if needed for accessibility, 
+   but usually, the label handles this perfectly. */
+.grid-cell-input input[type="radio"] {
+    pointer-events: none; 
+}
+
+.matrix-header,
+.matrix-header-gap {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background-color: #ffffff; /* Or your page background color */
+  z-index: 10; /* Increased to ensure it stays above all row elements */
+  padding-top: 10px; /* Provides "breathing room" so labels aren't cut off */
+  padding-bottom: 10px;
+}
+
+.matrix-header {
+  box-shadow: inset 0 -0.25rem 0 -0.125rem #d9d9d9;
+}
+
+.sticky-header {
+  position: sticky;
+  top: 30px;
+  z-index: 5;
+}
+
+.jspsych-survey-html-form-options-container-horizontal {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .625rem;
+}
+
+@media (min-width: 30rem) {
+  .jspsych-survey-html-form-options-container-horizontal {
+      grid-template-columns: repeat(var(--option-count), 1fr);
+      width: 100%;
+  }
+}
+
+
+/* Ensure checkmark is visible above the glow */
+.radio-button, .checkmark-svg {
+    position: relative;
+    z-index: 2;
+}
+
+/* --- 2. THE MATRIX HEADER BORDER --- */
+.matrix-scale-points-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%; /* Spans full grid column */
+    padding-bottom: 8px;
+    border-bottom: 3px solid transparent; /* Prevents layout jump */
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.matrix-scale-points-item.column-selected {
+    border-bottom: 3px solid #0070e0;
+    color: #0070e0;
+}
+
+/* Remove old conflicting border styles */
+.matrix-scale-points-item .display-with-image-display {
+    border: none !important;
 }
