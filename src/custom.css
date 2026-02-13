@@ -1063,6 +1063,7 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   display: grid;
   grid-template-columns: minmax(6.25rem, 23%) 1fr;
   grid-auto-rows: 1fr;
+  grid-column-gap: 10px;
 }
 
 .matrix-scale-points-items, 
@@ -1074,15 +1075,15 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
 }
 
 .jspsych-survey-html-form-matrix-row {
-    display: contents; /* Essential for grid child alignment */
+  display: contents; /* Essential for grid child alignment */
 }
 
 .jspsych-survey-html-form-matrix-row-label {
-    grid-column: 1;
-    font-size: 10pt;
-    text-align: left;
-    padding: 10px 0;
-    align-self: center;
+  grid-column: 1;
+  font-size: 10pt;
+  text-align: left;
+  padding: 10px 0;
+  align-self: center;
 }
 
 /* Highlight for regular (non-matrix) options */
