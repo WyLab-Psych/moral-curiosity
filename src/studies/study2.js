@@ -47,7 +47,10 @@ var jsPsych = initJsPsych({
 const participant_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
 const study_id = jsPsych.data.getURLVariable('STUDY_ID');
 const session_id = jsPsych.data.getURLVariable('SESSION_ID');
-const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
+// const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
+const filename = jsPsych.randomization.randomID(10) + ".csv";  // Random filename for anonymity
+
+
 const prolific_completion_code = "C1DCBGN4";
 const completion_time = 10;  // in minutes
 const pre_order = jsPsych.randomization.sampleWithoutReplacement(["worldview_first", "motives_first"], 1)[0];
