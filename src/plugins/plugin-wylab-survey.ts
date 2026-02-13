@@ -20,7 +20,6 @@ const info = <const>{
       nested: {
         prompt: { type: ParameterType.HTML_STRING, default: null },
         name: { type: ParameterType.STRING, default: "" },
-        options: { type: ParameterType.STRING, array: true, default: [] },
         background: { type: ParameterType.BOOL, default: false },
         format: {
           type: ParameterType.COMPLEX,
@@ -28,6 +27,8 @@ const info = <const>{
           nested: {
             type: { type: ParameterType.STRING, default: "radio" },
             mc_orientation: { type: ParameterType.STRING, default: "vertical" },
+            options: { type: ParameterType.STRING, array: true, default: [] },
+            write_in: { type: ParameterType.STRING, array: true, default: [] },
             labels: { type: ParameterType.STRING, array: true, default: [] },
             values: { type: ParameterType.STRING, array: true, default: [] },
             slider_direction: { type: ParameterType.STRING, default: "unipolar" },
@@ -64,7 +65,6 @@ const info = <const>{
             explanation: { type: ParameterType.HTML_STRING, default: "" }
           }
         },
-        write_in: { type: ParameterType.STRING, array: true, default: [] },
       },
     },
   },
@@ -137,15 +137,15 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
           html += `<p class="jspsych-survey-html-form-prompt">${question_prompt}</p>`;
           html += `<div class="jspsych-survey-html-form-options-container-${mc_orientation}" role="${question_format}-group">`;
           
-          for (let option_idx = 0; option_idx < question.options.length; option_idx++) {
+          for (let option_idx = 0; option_idx < mc.options.length; option_idx++) {
             const option_id = `${question_id}-opt-${option_idx}`;
             html += `
               <label class="jspsych-survey-html-form-${question_format}-option-${mc_orientation}" for="${option_id}">
                 <span class="${question_format}-button"></span>
-                <input type="${question_format}" name="${question_name}" id="${option_id}" value="${question.options[option_idx]}" ${question_requirements}>
-                <span class="${question_format}-button-label-${mc_orientation}">${question.options[option_idx]}</span>`;
+                <input type="${question_format}" name="${question_name}" id="${option_id}" value="${mc.values[option_idx]}" ${question_requirements}>
+                <span class="${question_format}-button-label-${mc_orientation}">${mc.options[option_idx]}</span>`;
             
-            if (question.write_in && question.write_in.includes(question.options[option_idx])) {
+            if (mc.write_in && mc.write_in.includes(mc.options[option_idx])) {
               html += `<input type="text" name="${question_name}-writein" class="jspsych-survey-html-form-writein">`;
             }
             html += `</label>`;
@@ -166,12 +166,12 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
                   html += `<div class="matrix-scale-points-item"><span class="display-with-image"><span class="display-with-image-display rich-text">${matrix_labels[label_idx]}</span></span></div>`;
                 }
             html += `</div></div>`;
-          for (let row_idx = 0; row_idx < question.options.length; row_idx++) {
+          for (let row_idx = 0; row_idx < matrix.options.length; row_idx++) {
             const row_group_name = `${question_name}_${matrix.names[row_idx]}`; 
             const row_id = `${question_id}-row-${row_idx}`;
             html += `
               <div class="jspsych-survey-html-form-matrix-row" id="${row_id}">
-                <div class="jspsych-survey-html-form-matrix-row-label"><span>${question.options[row_idx]}</span></div>
+                <div class="jspsych-survey-html-form-matrix-row-label"><span>${matrix.options[row_idx]}</span></div>
                 <div class="matrix-statement-items" role="radio-group">`;
             for (let value_idx = 0; value_idx < matrix_labels.length; value_idx++) {
               const option_id = `${question_id}-r${row_idx}-c${value_idx}`; 

@@ -50,19 +50,64 @@ const session_id = jsPsych.data.getURLVariable('SESSION_ID');
 // const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
 const filename = jsPsych.randomization.randomID(10) + ".csv";  // Random filename for anonymity
 
-
+// Prolific Completion Code
 const prolific_completion_code = "C1DCBGN4";
+
+// Study Completion Time
 const completion_time = 10;  // in minutes
+
+// Randomization for question orders, response options, and moral/immoral colors
 const pre_order = jsPsych.randomization.sampleWithoutReplacement(["worldview_first", "motives_first"], 1)[0];
+const task_order = jsPsych.randomization.sampleWithoutReplacement(["affect_first", "interest_first"], 1)[0];
 const post_order = pre_order;
 const approach_avoid_responses = jsPsych.randomization.shuffle(["Yes", "No"]);
+const approach_avoid_order = `${approach_avoid_responses[0].toLowerCase()}_${approach_avoid_responses[1].toUpperCase()}`;
+
 const moral_color = jsPsych.randomization.sampleWithoutReplacement(["blue", "red"], 1)[0];
 const immoral_color = (moral_color === "blue") ? "red" : "blue";
+const color_scheme = `moral_${moral_color}_immoral_${immoral_color}`;
+
+// Shuffled Stimuli
+const task_stimuli = jsPsych.randomization.shuffle(stimuli);
+const task_stimuli_names = task_stimuli.map(s => s.name);
+
+// Motives + Motive Labels
+const motiveData = [
+  { id: 'certainty', text: "...fill in gaps in my knowledge about people like this." },
+  { id: 'cognitive_mental', text: "...help me understand what is going on in the minds of people like this." },
+  { id: 'cognitive_context', text: "...help me understand the life experiences that lead people to become like this." },
+  { id: 'instrumental', text: "...be useful or helpful to me." },
+  { id: 'hedonic_affect', text: "...make me feel." },
+  { id: 'hedonic_fun', text: "...be fun or interesting to learn about." },
+  { id: 'social', text: "...help me understand how I relate or compare to people like this." }
+];
+
+const shuffledMotives = jsPsych.randomization.shuffle(motiveData);
+
+// Extract Motives and Motive Labels
+const motives_text = shuffledMotives.map(m => m.text);
+const motives_names = shuffledMotives.map(m => m.id);
 
 jsPsych.data.addProperties({
+  // Participant / Study / Session ID
   participant_id: participant_id,
   study_id: study_id,
   session_id: session_id,
+
+  // Pre-Task Questions Order (Worldview x ToM)
+  pre_question_order: pre_order,
+
+  // Task Randomization (Morality Color Scheme, Stimuli Order, Motives Order)
+  morality_color_order: color_scheme,
+  approach_avoid_order: approach_avoid_order,
+  stimuli_order: task_stimuli_names,
+  motive_order: motives_names,
+
+  // Task Questions Order (Affect x Interest)
+  task_question_order: task_order,
+  
+  // Post-Task Questions Order (Worldview x ToM)
+  post_question_order: post_order
 });
 
 // ---------------- PAGE 1 ---------------- //
@@ -119,11 +164,14 @@ const block_captcha = {
 const block_botcheck = {
   type: jsPsychWyLabSurvey,
   name: 'bot_check_tiger',
-  preamble: ``,
   questions: [
     {
       name: 'botcheck_response',
-      format: { type: "essay", rows: 3, cols: 60 },
+      format: { 
+        type: "essay", 
+        rows: 3,
+        cols: 60 
+      },
       prompt: `
         <p class="jspsych-survey-multi-choice-preamble">
           Please describe a <strong>tiger</strong> in exactly three words:
@@ -269,23 +317,20 @@ const block_consent_form = {
   questions: [
     { 
       name: 'consent',
-      options: ["YES, I consent to participate in this study", "NO, I do not consent to participate in this study"],
-      format: { type: 'radio' },
+      format: { 
+        type: 'radio',
+        options: ["YES, I consent to participate in this study", "NO, I do not consent to participate in this study"],
+        values: ["yes", "no"]
+      },
       requirements: { type: 'required' }
     }
   ],
   // If the participant does not consent, end the experiment
   on_finish(data) {
-    if (data.response.consent == "NO, I do not consent to participate in this study") {
-      jsPsych.data.addProperties({
-        consent: "no"
-      });
-    } else {
-      jsPsych.data.addProperties({
-        consent: "yes"
-      });
-    };
-    data.consent_given = (data.response.consent.includes("YES"));
+    jsPsych.data.addProperties({
+      consent_response: data.response.consent
+    });
+    data.consent_given = (data.response.consent.includes("yes"));
   }
 };
 
@@ -376,15 +421,23 @@ const block_pre_task = {
     const pre_worldview = {
       name: 'pre_worldview',
       prompt: "<p>Generally speaking, do you think that most people are <strong>morally good or morally bad?</strong></p>",
-      options: ["1<br>Extremely morally bad", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely morally good"],
-      format: { type: 'radio', mc_orientation: 'horizontal' },
+      format: { 
+        type: 'radio',
+        mc_orientation: 'horizontal', 
+        options: ["1<br>Extremely morally bad", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely morally good"],
+        values: [1, 2, 3, 4, 5, 6, 7] 
+      },
       requirements: { type: 'request' }
     };
     const pre_motives = {
       name: 'pre_motives',
       prompt: "<p>Generally speaking, how well do you think you understand people's <strong>motives</strong> for behaving the way they do?</p>",
-      options: ["1<br>Not well at all", "2", "3", "4", "5", "6", "7<br>Extremely well"],
-      format: { type: 'radio', mc_orientation: 'horizontal' },
+      format: { 
+        type: 'radio', 
+        mc_orientation: 'horizontal', 
+        options: ["1<br>Not well at all", "2", "3", "4", "5", "6", "7<br>Extremely well"],
+        values: [1, 2, 3, 4, 5, 6, 7] 
+      },
       requirements: { type: 'request' }
     };
     if (pre_order == "worldview_first") {
@@ -395,7 +448,8 @@ const block_pre_task = {
   },
   button_label: 'Next Page',
   on_finish(data) {
-    jsPsych.data.addProperties({
+    // Record pre-task responses
+    jsPsych.data.addProperties ({
       pre_worldview: data.response['pre_worldview'],
       pre_motives: data.response['pre_motives']
     });
@@ -404,33 +458,7 @@ const block_pre_task = {
 
 // ---------------- PAGE 5+ ---------------- //
 // NORMING TASK
-const task_stimuli = jsPsych.randomization.shuffle(stimuli);
-const task_stimuli_names = task_stimuli.map(s => s.name);
-let norming_trial_count = 0; // Initialize at 0
-
-jsPsych.data.addProperties({
-  stimuli_order: task_stimuli_names
-});
-
-console.log(task_stimuli)
-
-// 1. Define your motives with shorthand labels
-const motiveData = [
-  { id: 'certainty', text: "...fill in gaps in my knowledge about people like this." },
-  { id: 'cognitive_mental', text: "...help me understand what is going on in the minds of people like this." },
-  { id: 'cognitive_context', text: "...help me understand the life experiences that lead people to become like this." },
-  { id: 'instrumental', text: "...be useful or helpful to me." },
-  { id: 'hedonic_affect', text: "...make me feel." },
-  { id: 'hedonic_fun', text: "...be fun or interesting to learn about." },
-  { id: 'social', text: "...help me understand how I relate or compare to people like this." }
-];
-
-// 2. Shuffle the entire objects
-const shuffledMotives = jsPsych.randomization.shuffle(motiveData);
-
-// 3. Extract the parts you need
-const motives_text = shuffledMotives.map(m => m.text);
-const motives_names = shuffledMotives.map(m => m.id);
+let norming_trial_count = 0;
 
 const block_approach_avoid = {
   timeline: task_stimuli.map(stimulus => {
@@ -466,19 +494,21 @@ const block_approach_avoid = {
             </section>`;
           return page2_html;
         },
-        options: motives_text,
         format: { 
           type: 'matrix',
           names: motives_names,
+          options: motives_text,
           labels: ["<span style='font-size: 10pt;'>Not at all</span><br>1", "2", "3", "4", "5", "6", "<span style='font-size: 10pt;'>A great deal</span><br>7"],
           values: [1, 2, 3, 4, 5, 6, 7]
         },
         requirements: { type: 'request' }
       }],
       on_finish(data) {
+        // Record stimulus information
         data.stimulus_name = stimulus.name;
         data.stimulus_morality = stimulus.morality;
-        data.pretrial_motive_order = motives_names;
+
+        // Record motives responses
         data.pretrial_motive_certainty = data.response['pre_trial_motive_certainty'] || null;
         data.pretrial_motive_cognitive_mental = data.response['pre_trial_motive_cognitive_mental'] || null;
         data.pretrial_motive_cognitive_context = data.response['pre_trial_motive_cognitive_context'] || null;
@@ -495,20 +525,26 @@ const block_approach_avoid = {
       questions: [{
         name: "trial_decision",
         prompt: "<p style='font-size: 18pt;'>Would you like to <strong>show</strong> the full information about this person?</p>",
-        options: approach_avoid_responses,
-        format: { type: 'radio', mc_orientation: 'horizontal' },
+        format: { 
+          type: 'radio', 
+          mc_orientation: 'horizontal',
+          options: approach_avoid_responses,
+          values: approach_avoid_responses
+        },
         requirements: { type: 'required' }
       }],
       on_finish(data) {
         trial_decision = data.response['trial_decision'];
-        data.trial_decision = data.response['trial_decision'] === "Yes" ? "yes" : "no";
+        data.trial_decision = trial_decision === "Yes" ? 1 : 0;
+        
+        console.log(trial_decision);
+        console.log(data.trial_decision);
       }
     };
 
     const page3 = {
       type: jsPsychWyLabSurvey,
       preamble: function() {
-        // This function runs AFTER page2 finishes
         const isShow = (trial_decision === "Yes");
         const blur_switch = isShow ? "" : "faded-text";
         const decision_text = isShow ? "show" : "skip";
@@ -527,22 +563,37 @@ const block_approach_avoid = {
           <p style="font-size: 18pt;">You decided to <strong>${decision_text}</strong> the full information about this person.</p>`;
         return page3_html;
       },
-      questions: [
-        { 
+      questions() {
+        // Information Affect
+        const task_affect = {
           name: "post_trial_affect", 
           prompt: "<p>How <strong>positively or negatively</strong> does this information make you feel?</p>",
-          options: ["1<br>Extremely negatively", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely positively"], 
-          format: { type: 'radio', mc_orientation: 'horizontal'},
+          format: { 
+            type: 'radio', 
+            mc_orientation: 'horizontal', 
+            options: ["1<br>Extremely negatively", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely positively"],
+            values: [1, 2, 3, 4, 5, 6, 7] 
+          },
           requirements: { type: 'request' }
-        },
-        { 
+        };
+        // Information Interest
+        const task_interest = {
           name: "post_trial_interest", 
           prompt: "<p>How <strong>interesting</strong> is this information?</p>",
-          options: ["1<br>Not at all interesting", "2", "3", "4", "5", "6", "7<br>Extremely interesting"], 
-          format: { type: 'radio', mc_orientation: 'horizontal' },
+          format: { 
+            type: 'radio', 
+            mc_orientation: 'horizontal', 
+            options: ["1<br>Not at all interesting", "2", "3", "4", "5", "6", "7<br>Extremely interesting"], 
+            values: [1, 2, 3, 4, 5, 6, 7] 
+          },
           requirements: { type: 'request' }
         }
-      ],
+        if (task_order == "affect_first") {
+          return [task_affect, task_interest];
+        } else if (task_order == "interest_first") {
+          return [task_interest, task_affect];
+        };
+      },
       on_finish(data) {
         // Record post-trial responses
         data.posttrial_affect = data.response['post_trial_affect'] || null;
@@ -557,7 +608,6 @@ const block_approach_avoid = {
   })
 };
 
-
 // ---------------- PAGE 4 ---------------- //
 // POST-TASK
 const block_post_task = {
@@ -570,15 +620,23 @@ const block_post_task = {
     const post_worldview = {
       name: 'post_worldview',
       prompt: "<p>Generally speaking, do you think that most people are <strong>morally good or morally bad?</strong></p>",
-      options: ["1<br>Extremely morally bad", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely morally good"],
-      format: { type: 'radio', mc_orientation: 'horizontal' },
+      format: { 
+        type: 'radio', 
+        mc_orientation: 'horizontal', 
+        options: ["1<br>Extremely morally bad", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely morally good"],
+        values: [1, 2, 3, 4, 5, 6, 7] 
+      },
       requirements: { type: 'request' }
     };
     const post_motives = {
       name: 'post_motives',
       prompt: "<p>Generally speaking, how well do you think you understand people's <strong>motives</strong> for behaving the way they do?</p>",
-      options: ["1<br>Not well at all", "2", "3", "4", "5", "6", "7<br>Extremely well"],
-      format: { type: 'radio', mc_orientation: 'horizontal' },
+      format: { 
+        type: 'radio', 
+        mc_orientation: 'horizontal', 
+        options: ["1<br>Not well at all", "2", "3", "4", "5", "6", "7<br>Extremely well"],
+        values: [1, 2, 3, 4, 5, 6, 7] 
+      },
       requirements: { type: 'request' }
     };
     if (post_order == "worldview_first") {
@@ -610,9 +668,10 @@ const block_fiction_question = {
       name: 'fiction_consumption',
       format: {
         type: 'radio',
-        mc_orientation: 'horizontal'
+        mc_orientation: 'horizontal',
+        options: ["1<br>None", "2", "3", "4", "5", "6", "7<br>A great deal"],
+        values: [1, 2, 3, 4, 5, 6, 7]
       },
-      options: ["1<br>None", "2", "3", "4", "5", "6", "7<br>A great deal"],
       requirements: { type: 'request' }
     },
   ],
@@ -649,17 +708,17 @@ const block_demographics_questions = {
     {
       prompt: "With which gender do you identify?",
       name: 'gender',
-      options: [
-        "Woman",
-        "Man",
-        "Non-binary",
-        "Other:",
-        "Prefer not to disclose"
-      ],
-      write_in: ["Other:"],
       format: { 
         type: 'radio',
         orientation: 'vertical',
+        options: [
+          "Woman",
+          "Man",
+          "Non-binary",
+          "Other:",
+          "Prefer not to disclose"
+        ],
+        write_in: ["Other:"]
       },
       requirements: { type: 'request' }
     },
@@ -683,30 +742,22 @@ const block_demographics_questions = {
     {
       prompt: "Please indicate how you identify yourself:",
       name: 'race-ethnicity',
-      options: [
-        "White",
-        "African or African-American",
-        "Hispanic/Latine",
-        "Asian or Asian-American",
-        "Indigenous American or Alaskan Native",
-        "Native Hawaiian or other Pacific Islander",
-        "Other:", 
-        "Prefer not to disclose"
-      ],
-      write_in: ["Other:"],
       format: {
         type: 'checkbox',
-        selection: 'multiple'
+        options: ["Not at all religious", "Slightly religious", "Moderately religious", "Very religious"],
+        selection: 'multiple',
+        write_in: ["Other:"]
       },
       requirements: { type: 'request' }
     },
     {
       prompt: "To what extent do you consider yourself to be religious?",
       name: 'religion',
-      options: ["Not at all religious", "Slightly religious", "Moderately religious", "Very religious"],
       format: {
         type: 'radio',
-        mc_orientation: 'horizontal'
+        mc_orientation: 'horizontal',
+        options: ["Not at all religious", "Slightly religious", "Moderately religious", "Very religious"],
+        values: [1, 2, 3, 4]
       },
       requirements: { type: 'request' }
     }
@@ -736,19 +787,17 @@ const block_attention = {
     {
       prompt: `<strong>Overall, how much attention did you pay to this study while you were taking it?</strong>`,
       name: 'attention',
-      options: ["1<br>Not at all", "2", "3", "4", "5", "6", "7<br>Completely"],
       format: {
         type: 'radio',
-        mc_orientation: 'horizontal'
+        mc_orientation: 'horizontal',
+        options: ["1<br>Not at all", "2", "3", "4", "5", "6", "7<br>Completely"],
+        values: [1, 2, 3, 4, 5, 6, 7]
       },
       requirements: { type: 'request' }
     },
   ],
   button_label: 'Next Page',
   on_finish(data) {
-    // Extract the first character and convert to a number
-    const response = data.response['attention'];
-    data.attention = response ? parseInt(response[0]) : null;
     jsPsych.data.addProperties({
       attention: data.attention
     });
@@ -791,8 +840,7 @@ const block_debrief = {
         If you have any concerns about research-related ethics or harm, or would like to learn more about the ethical constraints under which this study was conducted, 
         please contact the Cornell University Institutional Review Board (IRB) for Human Participants <a href="tel:16072556182"><i class="fa-solid fa-phone fa-xs"></i>&nbsp;+1&nbsp;(607)&nbsp;255&ndash;6182</a> or access their website <a href="https://researchservices.cornell.edu/offices/IRB" target="_blank">researchservices.cornell.edu/offices/IRB&nbsp;<i class="fa-solid fa-external-link fa-xs"></i></a>. Thank you for your participation!
       </p>
-    </section>`,
-  questions: []
+    </section>`
 };
 
 // ---------------- PAGE 11 ---------------- //
@@ -913,6 +961,7 @@ const block_no_consent_exit = {
 timeline.push(block_consent_form);
 timeline.push(survey_flow);
 timeline.push(block_no_consent_exit);
+
 
 // Function to initialize the experiment
 function startExperiment() {
