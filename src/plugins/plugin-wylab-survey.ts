@@ -21,7 +21,7 @@ const info = <const>{
         prompt: { type: ParameterType.HTML_STRING, default: null },
         name: { type: ParameterType.STRING, default: "" },
         background: { type: ParameterType.BOOL, default: false },
-        format: {
+        question_parameters: {
           type: ParameterType.COMPLEX,
           default: {},
           nested: {
@@ -104,14 +104,14 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
         const question = questions[original_idx];
         const question_id = `jspsych-survey-question-${original_idx}`;
         const question_name = question.name || question_id;
-        const question_format = question.format?.type || 'short_response';
+        const question_type = question.question_parameters?.type || 'short_response';
         const question_requirements = (question.requirements?.type === 'required' || question.requirements?.type === 'comprehension') ? 'required' : '';
         const question_prompt = question.prompt || "";
         
         html += `<fieldset class="jspsych-survey-html-form-question-minimal incomplete" id="${question_id}">`;
 
-        if (question_format === "slider") {
-            const slider = question.format;
+        if (question_type === "slider") {
+            const slider = question.question_parameters || {};
             const slider_direction = slider.slider_direction || 'bipolar';
             const slider_color_scheme = slider.slider_color_scheme || (slider_direction === 'unipolar' ? 'purple' : 'orange-purple');
             const slider_starting_value = slider.slider_starting_value !== undefined ? slider.slider_starting_value : 50;
@@ -131,19 +131,19 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
                 <span class="jspsych-slider-right-anchor">${slider_anchors.right}</span>
               </div>`;
   
-        } else if (question_format === "radio" || question_format === "checkbox") {
-          const mc = question.format;
+        } else if (question_type === "radio" || question_type === "checkbox") {
+          const mc = question.question_parameters || {};
           const mc_orientation = mc.mc_orientation || 'vertical';
           html += `<p class="jspsych-survey-html-form-prompt">${question_prompt}</p>`;
-          html += `<div class="jspsych-survey-html-form-options-container-${mc_orientation}" role="${question_format}-group">`;
+          html += `<div class="jspsych-survey-html-form-options-container-${mc_orientation}" role="${question_type}-group">`;
           
           for (let option_idx = 0; option_idx < mc.options.length; option_idx++) {
             const option_id = `${question_id}-opt-${option_idx}`;
             html += `
-              <label class="jspsych-survey-html-form-${question_format}-option-${mc_orientation}" for="${option_id}">
-                <span class="${question_format}-button"></span>
-                <input type="${question_format}" name="${question_name}" id="${option_id}" value="${mc.values[option_idx]}" ${question_requirements}>
-                <span class="${question_format}-button-label-${mc_orientation}">${mc.options[option_idx]}</span>`;
+              <label class="jspsych-survey-html-form-${question_type}-option-${mc_orientation}" for="${option_id}">
+                <span class="${question_type}-button"></span>
+                <input type="${question_type}" name="${question_name}" id="${option_id}" value="${mc.values[option_idx]}" ${question_requirements}>
+                <span class="${question_type}-button-label-${mc_orientation}">${mc.options[option_idx]}</span>`;
             
             if (mc.write_in && mc.write_in.includes(mc.options[option_idx])) {
               html += `<input type="text" name="${question_name}-writein" class="jspsych-survey-html-form-writein">`;
@@ -152,8 +152,8 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
           }
           html += `</div>`;
 
-        } else if (question_format === "matrix") {
-          const matrix = question.format;
+        } else if (question_type === "matrix") {
+          const matrix = question.question_parameters || {};
           const matrix_labels = matrix.labels || [];
           const matrix_values = matrix.values || matrix.labels || [];
           html += `
@@ -190,16 +190,16 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
           }
           html += `</div>`;
 
-        } else if (question_format === "number") {
-          const number = question.format;
+        } else if (question_type === "number") {
+          const number = question.question_parameters || {};
           html += `<label class="jspsych-survey-html-form-prompt" for="${question_id}-resp">${question_prompt}</label>
                    <input id="${question_id}-resp" class="jspsych-number-input" name="${question_name}" type="number" min="${number.number_min}" max="${number.number_max}" step="${number.number_step}" ${question_requirements}>`;
-        } else if (question_format === "short_response") {
-          const short = question.format;
+        } else if (question_type === "short_response") {
+          const short = question.question_parameters || {};
           html += `<label class="jspsych-survey-html-form-prompt" for="${question_id}-resp">${question_prompt}</label>
                    <input id="${question_id}-resp" class="jspsych-text-input" name="${question_name}" type="text" ${short.short_text_max_length ? 'maxlength="'+short.short_text_max_length+'"' : ''} placeholder="${short.short_text_placeholder || ''}" ${question_requirements}>`;
-        } else if (question_format === "essay") {
-          const essay = question.format;
+        } else if (question_type === "essay") {
+          const essay = question.question_parameters || {};
           html += `<label class="jspsych-survey-html-form-prompt" for="${question_id}-resp">${question_prompt}</label>
                    <textarea id="${question_id}-resp" class="jspsych-textarea-input" name="${question_name}" rows="${essay.essay_rows}" cols="${essay.essay_cols}" ${essay.essay_max_length ? 'maxlength="'+essay.essay_max_length+'"' : ''} placeholder="${essay.essay_placeholder || ''}" ${question_requirements}></textarea>`;
         }
@@ -335,7 +335,7 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
         const question = questions[questionIdx];
         if (!question) return; 
 
-        const question_format = question.format?.type || 'short_response';
+        const question_type = question.question_parameters?.type || 'short_response';
 
         // Highlighting for Radio/Checkbox
         if (target.type === 'radio' || target.type === 'checkbox') {
@@ -354,13 +354,8 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
             target.closest('.grid-cell')?.classList.add('selected');
           }
 
-          // Matrix Column Highlight Logic
-          // if (question_format === "matrix" && matrixContainer) {
-          
-          // }
-
           // Validation completeness
-          if (question_format === "matrix") {
+          if (question_type === "matrix") {
             const allRows = fieldset.querySelectorAll('.jspsych-survey-html-form-matrix-row');
             const answeredRows = Array.from(allRows).filter(row => row.querySelector('input:checked'));
             answeredRows.length === allRows.length ? fieldset.classList.remove('incomplete') : fieldset.classList.add('incomplete');
