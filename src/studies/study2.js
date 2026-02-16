@@ -104,65 +104,71 @@ const block_captcha = {
   type: jsPsychWyLabSurvey,
   name: 'captcha',
   preamble: `
-    <p>Please verify to continue:</p>
+    <p>Please complete the verification below:</p>
     <div id="recaptcha-container"></div>
-    <div id="captcha-status" style="margin-top: 10px; display: none;">Verifying...</div>
     <button id="custom-next-btn" class="jspsych-btn" style="margin-top: 20px;">Continue</button>
+    
     <style>
-      .jspsych-survey-html-form-next, .jspsych-btn:not(#custom-next-btn) { display: none !important; }
-    </style>`,
-  on_load() { 
+      /* Hide the default survey button provided by the plugin */
+      .jspsych-survey-html-form-next, 
+      .jspsych-survey-multi-choice-next,
+      .jspsych-btn:not(#custom-next-btn) { 
+        display: none !important; 
+      }
+  </style>`,
+  on_load() {
     let captchaToken = null;
     const customBtn = document.getElementById('custom-next-btn');
-    const statusDiv = document.getElementById('captcha-status');
 
-    if (window.grecaptcha && window.grecaptcha.enterprise) {
-      grecaptcha.enterprise.render('recaptcha-container', {
-        'sitekey': '6LfBRVAsAAAAAB7bci0_0TlzXC5Bv8vgZg2R7s_a',
-        'callback': (token) => { captchaToken = token; }
-      });
-    }
-
-    customBtn.addEventListener('click', function() {
-      if (!captchaToken) {
-        alert("Please complete the CAPTCHA.");
-        return;
-      }
-
-      customBtn.disabled = true;
-      statusDiv.style.display = 'block';
-      statusDiv.innerText = "Verifying...";
-
-      // Define a global function for the Google Script to call
-      window.handleCaptchaResponse = function(result) {
-        const score = result.riskAnalysis ? result.riskAnalysis.score : "no_score";
+    // 1. Define the callback GLOBALLY so the script can find it
+    window.receiveCaptchaScore = function(result) {
+        console.log("Data received from Google:", result);
         
-        // Clean up the script tag
-        document.getElementById('captcha-jsonp')?.remove();
-        delete window.handleCaptchaResponse;
+        const score = result.riskAnalysis ? result.riskAnalysis.score : null;
 
-        jsPsych.finishTrial({ 
-          captcha_token: captchaToken,
+        // 2. THIS is what advances the page
+        jsPsych.finishTrial({
           captcha_score: score,
           status: "success"
         });
-      };
 
-      // Create a script tag to bypass CORS
-      const script = document.createElement('script');
-      script.id = 'captcha-jsonp';
-      const scriptURL = 'https://script.google.com/macros/s/AKfycbyJoX9VSys0kyHUrPFMoNiO6cp8EMbce36MWWHMPVP8XKxVFxM5Hom_9JI-khbhSQ9y/exec'; 
-      script.src = `${scriptURL}?token=${captchaToken}&callback=handleCaptchaResponse`;
-      
-      script.onerror = () => {
-        console.warn("JSONP failed, proceeding without score.");
-        jsPsych.finishTrial({ captcha_token: captchaToken, status: "fetch_failed" });
-      };
+        // Cleanup the script tag
+        const oldScript = document.getElementById('jsonp-tag');
+        if (oldScript) oldScript.remove();
+        delete window.receiveCaptchaScore;
+    };
 
-      document.body.appendChild(script);
+    // Initialize reCAPTCHA
+    grecaptcha.enterprise.render('recaptcha-container', {
+        'sitekey': '6LfBRVAsAAAAAB7bci0_0TlzXC5Bv8vgZg2R7s_a',
+        'callback': (token) => { captchaToken = token; }
+    });
+
+    customBtn.addEventListener('click', function() {
+        if (!captchaToken) {
+            alert("Please complete the CAPTCHA.");
+            return;
+        }
+        customBtn.disabled = true;
+        customBtn.innerText = "Please wait, verifying...";
+
+        // 3. Create the script tag
+        const script = document.createElement('script');
+        script.id = 'jsonp-tag';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyJoX9VSys0kyHUrPFMoNiO6cp8EMbce36MWWHMPVP8XKxVFxM5Hom_9JI-khbhSQ9y/exec';
+        // Ensure &callback= matches the window function name exactly
+        script.src = `${scriptURL}?token=${captchaToken}&callback=receiveCaptchaScore`;
+        
+        script.onerror = () => {
+          console.error("JSONP Script failed to load.");
+          jsPsych.finishTrial({ status: "network_error" });
+        };
+        
+        document.body.appendChild(script);
     });
   }
 };
+
 
 const block_botcheck = {
   type: jsPsychWyLabSurvey,
