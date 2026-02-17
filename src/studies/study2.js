@@ -344,7 +344,8 @@ const study_instructions = [
   // 2. Task Overview
   `<p class="align-left" style="margin-bottom: 1em;">
     On each trial, you will read a brief description of someone and then answer questions about what you think and feel about that information. 
-    Some of the text is intentionally blurred out to start, and you will be asked whether you would like to <strong>reveal more information or skip the trial.</strong>
+    Some of the text is intentionally blurred out to start, and you will be asked whether you would like to <strong>reveal more information or skip seeing more information.</strong> 
+    The task will take approximately the same amount of time regardless of if you skip or show the information.
   </p>
   <p class="align-left">
     Please note that some descriptions include potentially disturbing content, including violence, sexual assault, or other sensitive topics.
