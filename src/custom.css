@@ -493,20 +493,22 @@ blockquote {
   padding: 0 20px 0;
     -webkit-mask-image: linear-gradient(
     to bottom,
-    black 5%,
-    black 15%,              /* readable zone */
-    rgba(0,0,0,0.15) 40%,   /* steep drop */
-    rgba(0,0,0,0.05) 95%  /* almost invisible, but present */
+    black 0%,
+    black 0%,              /* readable zone */
+    rgba(0,0,0,0.75) 1%,   /* steep drop */
+    rgba(0,0,0,0.25) 50%,
+    rgba(0,0,0,0) 99%  /* almost invisible, but present */
   );
 
   mask-image: linear-gradient(
     to bottom,
-    black 5%,
-    black 15%,
-    rgba(0,0,0,0.15) 40%,
-    rgba(0,0,0,0.05) 95%
+    black 0%,
+    black 0%,
+    rgba(0,0,0,0.75) 1%,
+    rgba(0,0,0,0.25) 50%,
+    rgba(0,0,0,0) 99%
   );
-  filter: blur(2px);
+  filter: blur(3px);
 }
 
 

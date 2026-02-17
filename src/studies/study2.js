@@ -933,6 +933,7 @@ const block_redirect = {
       <p>If you are not redirected automatically, please click <a href="https://app.prolific.com/submissions/complete?cc=${prolific_completion_code}" target="_blank">here&nbsp;<i class="fa-solid fa-external-link fa-xs"></i></a>.</p>
     </div>`,
   on_load() {
+    jsPsych.progressBar.progress = 1;
     let timeLeft = 5;
     const timer = setInterval(function() {  
       timeLeft--;
