@@ -660,7 +660,7 @@ const block_post_task = {
 const block_end_task = {
   type: jsPsychWyLabSurvey,
   preamble: 'Great work! The next set of questions is about you.<br>Please read each carefully and answer honestly.',
-  button_label: 'Begin Task',
+  button_label: 'Next Page',
 }
 
 // ---------------- PAGE 8 ---------------- //
