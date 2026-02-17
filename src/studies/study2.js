@@ -39,21 +39,21 @@ var jsPsych = initJsPsych({
 const participant_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
 const study_id = jsPsych.data.getURLVariable('STUDY_ID');
 const session_id = jsPsych.data.getURLVariable('SESSION_ID');
-// const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
-const filename = jsPsych.randomization.randomID(10) + ".csv";  // Random filename for anonymity
+const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
+// const filename = jsPsych.randomization.randomID(10) + ".csv";
 
 // Prolific Completion Code
 const prolific_completion_code = "C1DCBGN4";
 
 // Study Completion Time
-const completion_time = 10;  // in minutes
+const completion_time = 14;  // in minutes
 
 // Randomization for question orders, response options, and moral/immoral colors
 const pre_order = jsPsych.randomization.sampleWithoutReplacement(["worldview_first", "motives_first"], 1)[0];
 const task_order = jsPsych.randomization.sampleWithoutReplacement(["affect_first", "interest_first"], 1)[0];
 const post_order = pre_order;
 const approach_avoid_responses = jsPsych.randomization.shuffle(["Yes", "No"]);
-const approach_avoid_order = `${approach_avoid_responses[0].toLowerCase()}_${approach_avoid_responses[1].toUpperCase()}`;
+const approach_avoid_order = `${approach_avoid_responses[0].toLowerCase()}_${approach_avoid_responses[1].toLowerCase()}`;
 
 const moral_color = jsPsych.randomization.sampleWithoutReplacement(["blue", "red"], 1)[0];
 const immoral_color = (moral_color === "blue") ? "red" : "blue";
@@ -94,7 +94,7 @@ jsPsych.data.addProperties({
   motive_order: motives_names,
 
   // Task Questions Order (Affect x Interest)
-  task_dv_order: task_order,
+  task_dv_order: task_order
 });
 
 // ---------------- PAGE 1 ---------------- //
@@ -112,63 +112,55 @@ const block_captcha = {
       /* Hide the default survey button provided by the plugin */
       .jspsych-survey-html-form-next, 
       .jspsych-survey-multi-choice-next,
-      .jspsych-btn:not(#custom-next-btn) { 
-        display: none !important; 
-      }
-  </style>`,
+      .jspsych-btn:not(#custom-next-btn) { display: none !important; }
+    </style>`,
   on_load() {
     let captchaToken = null;
     const customBtn = document.getElementById('custom-next-btn');
 
     // 1. Define the callback GLOBALLY so the script can find it
     window.receiveCaptchaScore = function(result) {
-        console.log("Data received from Google:", result);
-        
-        const score = result.riskAnalysis ? result.riskAnalysis.score : null;
+      // console.log("Data received from Google:", result);
+      const score = result.riskAnalysis ? result.riskAnalysis.score : null;
 
-        // 2. THIS is what advances the page
-        jsPsych.finishTrial({
-          captcha_score: score,
-          status: "success"
-        });
+      // 2. THIS is what advances the page
+      jsPsych.finishTrial({ captcha_score: score });
 
-        // Cleanup the script tag
-        const oldScript = document.getElementById('jsonp-tag');
-        if (oldScript) oldScript.remove();
-        delete window.receiveCaptchaScore;
+      // Cleanup the script tag
+      const oldScript = document.getElementById('jsonp-tag');
+      if (oldScript) oldScript.remove();
+      delete window.receiveCaptchaScore;
     };
 
     // Initialize reCAPTCHA
     grecaptcha.enterprise.render('recaptcha-container', {
-        'sitekey': '6LfBRVAsAAAAAB7bci0_0TlzXC5Bv8vgZg2R7s_a',
-        'callback': (token) => { captchaToken = token; }
+      'sitekey': '6LfBRVAsAAAAAB7bci0_0TlzXC5Bv8vgZg2R7s_a',
+      'callback': (token) => { captchaToken = token; }
     });
 
     customBtn.addEventListener('click', function() {
-        if (!captchaToken) {
-            alert("Please complete the CAPTCHA.");
-            return;
-        }
-        customBtn.disabled = true;
-        customBtn.innerText = "Please wait, verifying...";
+      if (!captchaToken) {
+        alert("Please complete the CAPTCHA.");
+        return;
+      };
+      customBtn.disabled = true;
+      customBtn.innerText = "Verifying...";
 
-        // 3. Create the script tag
-        const script = document.createElement('script');
-        script.id = 'jsonp-tag';
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyJoX9VSys0kyHUrPFMoNiO6cp8EMbce36MWWHMPVP8XKxVFxM5Hom_9JI-khbhSQ9y/exec';
-        // Ensure &callback= matches the window function name exactly
-        script.src = `${scriptURL}?token=${captchaToken}&callback=receiveCaptchaScore`;
+      // 3. Create the script tag
+      const script = document.createElement('script');
+      script.id = 'jsonp-tag';
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyJoX9VSys0kyHUrPFMoNiO6cp8EMbce36MWWHMPVP8XKxVFxM5Hom_9JI-khbhSQ9y/exec';
+      script.src = `${scriptURL}?token=${captchaToken}&callback=receiveCaptchaScore`;
+      
+      script.onerror = () => {
+        console.error("JSONP Script failed to load.");
+        jsPsych.finishTrial({ status: "network_error" });
+      };
         
-        script.onerror = () => {
-          console.error("JSONP Script failed to load.");
-          jsPsych.finishTrial({ status: "network_error" });
-        };
-        
-        document.body.appendChild(script);
+      document.body.appendChild(script);
     });
   }
 };
-
 
 const block_botcheck = {
   type: jsPsychWyLabSurvey,
@@ -236,8 +228,8 @@ const block_consent_form = {
       <section>
         <h3><i class="fa fa-2xs fa-chevron-circle-down"></i>&nbsp;<strong>What we will ask you to do</strong></h3>
         <p class="indented align-left">
-          We will ask you to complete a study that takes approximately<i class="fa-solid fa-stopwatch"></i><strong>${completion_time} minutes</strong>. The study will include 
-          demographic questions (e.g., age, gender), brief tasks or vignettes, and questions about your thoughts, 
+          We will ask you to complete a study that takes approximately<i class="fa-solid fa-stopwatch"></i><strong>${completion_time} minutes</strong>. 
+          The study will include demographic questions (e.g., age, gender), brief tasks or vignettes, and questions about your thoughts, 
           perceptions, and reactions. In some cases, you may be asked to read short stories or view images before answering questions.
         </p>
       </section>
@@ -380,7 +372,6 @@ const study_instructions = [
 ];
 
 // STUDY INSTRUCTIONS
-// Define the trial structure
 const page_instructions = {
   type: jsPsychWyLabSurvey,
   preamble: jsPsych.timelineVariable('full_html'), 
@@ -417,8 +408,8 @@ const block_instructions = {
 // PRE-TASK
 const block_pre_task = {
   type: jsPsychWyLabSurvey,
-  preamble: `
-    <p class="jspsych-survey-multi-choice-preamble">
+  preamble: 
+    `<p class="jspsych-survey-multi-choice-preamble">
       Before you begin the main task, please respond to the following questions:
     </p>`,
   questions() {
@@ -454,8 +445,8 @@ const block_pre_task = {
   on_finish(data) {
     // Record pre-task responses
     jsPsych.data.addProperties ({
-      pre_worldview: data.response['pre_worldview'],
-      pre_motives: data.response['pre_motives']
+      pre_worldview: data.response['pre_worldview'] || null,
+      pre_motives: data.response['pre_motives'] || null
     });
   }
 };
@@ -650,8 +641,10 @@ const block_post_task = {
   },
   button_label: 'Next Page',
   on_finish(data) {
-    data.post_worldview = data.response['post_worldview'] || null;
-    data.post_motives = data.response['post_motives'] || null;
+    jsPsych.data.addProperties ({
+      post_worldview: data.response['post_worldview'] || null,
+      post_motives: data.response['post_motives'] || null
+    });
   }
 };
 
@@ -829,7 +822,7 @@ const block_attention = {
   button_label: 'Next Page',
   on_finish(data) {
     jsPsych.data.addProperties({
-      attention: data.attention || null
+      attention: data.response['attention'] || null
     });
   }
 };
@@ -914,13 +907,9 @@ const block_save_data = {
   action: "save",
   experiment_id: "lgb8FqT4eANO",
   filename: filename,
-  data_string: () => jsPsych.data.get().csv(),
-  on_load() {
-    console.log("Data saved!");
-  }
+  data_string: () => jsPsych.data.get().csv()
 };
 
-// --- redirect to Prolific with countdown timer ---
 const block_redirect = {
   type: jsPsychWyLabSurvey,
   preamble: `
@@ -930,7 +919,7 @@ const block_redirect = {
       <p>If you are not redirected automatically, please click <a href="https://app.prolific.com/submissions/complete?cc=${prolific_completion_code}" target="_blank">here&nbsp;<i class="fa-solid fa-external-link fa-xs"></i></a>.</p>
     </div>`,
   on_load() {
-    let timeLeft = 500;
+    let timeLeft = 5;
     const timer = setInterval(function() {  
       timeLeft--;
       const display = document.querySelector('#countdown');
@@ -938,7 +927,7 @@ const block_redirect = {
       if (timeLeft <= 0) {
         clearInterval(timer);
         window.location.href = `https://app.prolific.com/submissions/complete?cc=${prolific_completion_code}`;
-      }
+      };
     }, 1000);
     const nextButton = document.querySelector('#next-btn');
     if (nextButton) {
@@ -950,16 +939,16 @@ const block_redirect = {
 // Survey Flow
 const survey_flow = {
   timeline: [
-    // block_instructions, 
-    // block_pre_task,
-    // block_approach_avoid,
-    // block_post_task,
-    // block_fiction_question,
-    // block_demographics_questions, 
-    // block_attention,
-    // block_debrief,
-    // block_feedback,
-    // block_exit_fullscreen,
+    block_instructions, 
+    block_pre_task,
+    block_approach_avoid,
+    block_post_task,
+    block_fiction_question,
+    block_demographics_questions, 
+    block_attention,
+    block_debrief,
+    block_feedback,
+    block_exit_fullscreen,
     block_save_data,
     block_redirect
   ],
@@ -987,10 +976,7 @@ const block_no_consent_exit = {
 };
 
 // Push to timeline in order
-timeline.push([block_browser_check, block_enter_fullscreen, block_captcha, block_botcheck]);
-timeline.push(block_consent_form);
-timeline.push(survey_flow);
-timeline.push(block_no_consent_exit);
+timeline.push([block_browser_check, block_enter_fullscreen, block_captcha, block_botcheck, block_consent_form, survey_flow, block_no_consent_exit]);
 
 // Function to initialize the experiment
 function startExperiment() { jsPsych.run(timeline); };
