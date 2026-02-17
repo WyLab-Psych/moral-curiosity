@@ -429,25 +429,7 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
       }
     });
 
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const requestIndices = questions.map((q, i) => q.requirements?.type === 'request' ? i : -1).filter(idx => idx !== -1);
-      const incomplete = requestIndices.filter(idx => display_element.querySelector(`#jspsych-survey-question-${idx}`)?.classList.contains("incomplete"));
-
-      if (incomplete.length > 0 && !forceSubmit) {
-        (display_element.querySelector("#jspsych-survey-overlay") as HTMLElement).style.display = "block";
-        (display_element.querySelector("#jspsych-confirm-popup") as HTMLElement).style.display = "block";
-        display_element.querySelector("#confirm-yes")?.addEventListener("click", () => {
-          (display_element.querySelector("#jspsych-survey-overlay") as HTMLElement).style.display = "none";
-          (display_element.querySelector("#jspsych-confirm-popup") as HTMLElement).style.display = "none";
-        }, { once: true });
-        display_element.querySelector("#confirm-no")?.addEventListener("click", () => {
-          forceSubmit = true;
-          form.dispatchEvent(new Event('submit'));
-        }, { once: true });
-        return;
-      }
-
+    const endTrial = () => {
       display_element.querySelectorAll<HTMLInputElement>('input[type="range"]').forEach(s => {
         if (s.getAttribute('data-touched') !== 'true') s.removeAttribute('name');
       });
@@ -456,6 +438,32 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
         rt: Math.round(performance.now() - startTime),
         response: trial.dataAsArray ? serializeArray(form) : objectifyForm(serializeArray(form))
       });
+    };
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      
+      const requestIndices = questions.map((q, i) => q.requirements?.type === 'request' ? i : -1).filter(idx => idx !== -1);
+      const incomplete = requestIndices.filter(idx => display_element.querySelector(`#jspsych-survey-question-${idx}`)?.classList.contains("incomplete"));
+
+      if (incomplete.length > 0 && !forceSubmit) {
+        (display_element.querySelector("#jspsych-survey-overlay") as HTMLElement).style.display = "block";
+        (display_element.querySelector("#jspsych-confirm-popup") as HTMLElement).style.display = "block";
+        
+        display_element.querySelector("#confirm-yes")?.addEventListener("click", () => {
+          (display_element.querySelector("#jspsych-survey-overlay") as HTMLElement).style.display = "none";
+          (display_element.querySelector("#jspsych-confirm-popup") as HTMLElement).style.display = "none";
+        }, { once: true });
+
+        display_element.querySelector("#confirm-no")?.addEventListener("click", () => {
+          forceSubmit = true;
+          endTrial(); // Directly call the finish function
+        }, { once: true });
+        
+        return;
+      }
+
+      endTrial();
     });
 
     function serializeArray(f: HTMLFormElement) {
@@ -473,12 +481,15 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
     function objectifyForm(arr: any[]) {
       const obj: any = {};
       arr.forEach(i => {
-        if (i.name in obj) { obj[i.name] = Array.isArray(obj[i.name]) ? [...obj[i.name], i.value] : [obj[i.name], i.value]; }
-        else { obj[i.name] = i.value; }
+        if (i.name in obj) { 
+          obj[i.name] = Array.isArray(obj[i.name]) ? [...obj[i.name], i.value] : [obj[i.name], i.value]; 
+        } else { 
+          obj[i.name] = i.value; 
+        }
       });
       return obj;
-    }
-  }
+    };
+  };
 }
 
 export default WyLabSurveyPlugin;
