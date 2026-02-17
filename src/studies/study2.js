@@ -52,7 +52,7 @@ const completion_time = 14;  // in minutes
 const pre_order = jsPsych.randomization.sampleWithoutReplacement(["worldview_first", "motives_first"], 1)[0];
 const task_order = jsPsych.randomization.sampleWithoutReplacement(["affect_first", "interest_first"], 1)[0];
 const post_order = pre_order;
-const approach_avoid_responses = jsPsych.randomization.shuffle(["Yes", "No"]);
+const approach_avoid_responses = jsPsych.randomization.shuffle(["Show", "Skip"]);
 const approach_avoid_order = `${approach_avoid_responses[0].toLowerCase()}_${approach_avoid_responses[1].toLowerCase()}`;
 
 const moral_color = jsPsych.randomization.sampleWithoutReplacement(["blue", "red"], 1)[0];
@@ -415,7 +415,7 @@ const block_pre_task = {
   questions() {
     const pre_worldview = {
       name: 'pre_worldview',
-      prompt: "<p>Generally speaking, do you think that most people are <strong>morally good or morally bad?</strong></p>",
+      prompt: "<p>Generally speaking, do you think that <strong>most people</strong> are morally good or morally bad?</p>",
       question_parameters: { 
         type: 'radio',
         mc_orientation: 'horizontal', 
@@ -451,7 +451,14 @@ const block_pre_task = {
   }
 };
 
-// ---------------- PAGE 5+ ---------------- //
+// ---------------- PAGE 5 ---------------- //
+const block_begin_task = {
+  type: jsPsychWyLabSurvey,
+  preamble: 'Great! We will now begin the main task.',
+  button_label: 'Begin Task',
+}
+
+// ---------------- PAGE 6+ ---------------- //
 // NORMING TASK
 let norming_trial_count = 0;
 
@@ -480,9 +487,9 @@ const block_approach_avoid = {
           const page2_html = `
             <section>
               <p>
-                Based on what you can read about this person here, how <em>much</em> do each of the following 
-                <strong>considerations factor into your decision</strong> 
-                about whether or not you would like to <strong>learn more?</strong>
+                Based on what you can read about this person, how much do each of <strong>the following</strong> 
+                factor into your decision about whether or not you would like to 
+                <strong>show or skip</strong> more information about this person?
               </p>
               <p style="font-size: 18pt;">How the information would:</p>
             </section>`;
@@ -519,7 +526,7 @@ const block_approach_avoid = {
       questions: [{
         // Approach-Avoidance Decision
         name: "trial_decision",
-        prompt: "<p style='font-size: 18pt;'>Would you like to <strong>show</strong> the full information about this person?</p>",
+        prompt: "<p style='font-size: 18pt;'>Would you like to <strong>reveal</strong> more information about this person?</p>",
         question_parameters: { 
           type: 'radio', 
           mc_orientation: 'horizontal',
@@ -530,16 +537,16 @@ const block_approach_avoid = {
       }],
       on_finish(data) {
         trial_decision = data.response['trial_decision'];
-        data.trial_decision = trial_decision === "Yes" ? 1 : 0;
+        data.trial_decision = trial_decision === "Show" ? 1 : 0;
       }
     };
 
     const page3 = {
       type: jsPsychWyLabSurvey,
       preamble: function() {
-        const isShow = (trial_decision === "Yes");
+        const isShow = (trial_decision === "Show");
         const blur_switch = isShow ? "" : "faded-text";
-        const decision_text = isShow ? "show" : "skip";
+        const decision_text = isShow ? "You decided to <strong>show</strong> the full information about this person." : "You decided to <strong>skip</strong> the full information about this person. Please answer the following questions about the information you can see."
 
         const page3_html = `
           <section>
@@ -552,7 +559,7 @@ const block_approach_avoid = {
               </div>
             </div>
           </section>
-          <p style="font-size: 18pt;">You decided to <strong>${decision_text}</strong> the full information about this person.</p>`;
+          <p style="font-size: 18pt;">${decision_text}</p>`;
         return page3_html;
       },
       questions() {
@@ -612,7 +619,7 @@ const block_post_task = {
     // Post-Task Worldview
     const post_worldview = {
       name: 'post_worldview',
-      prompt: "<p>Generally speaking, do you think that most people are <strong>morally good or morally bad?</strong></p>",
+      prompt: "<p>Generally speaking, do you think that <strong>most people</strong> are morally good or morally bad?</p>",
       question_parameters: { 
         type: 'radio', 
         mc_orientation: 'horizontal', 
@@ -649,6 +656,13 @@ const block_post_task = {
 };
 
 // ---------------- PAGE 7 ---------------- //
+const block_end_task = {
+  type: jsPsychWyLabSurvey,
+  preamble: 'Great work! The next set of questions is about you. Please read each carefully and answer honestly.',
+  button_label: 'Begin Task',
+}
+
+// ---------------- PAGE 8 ---------------- //
 // FICTION CONSUMPTION
 const block_fiction_question = {
   type: jsPsychWyLabSurvey,
@@ -678,7 +692,7 @@ const block_fiction_question = {
   }
 };
 
-// ---------------- PAGE 8 ---------------- //
+// ---------------- PAGE 9 ---------------- //
 // DEMOGRAPHICS
 const block_demographics_questions = {
   type: jsPsychWyLabSurvey,
@@ -797,7 +811,7 @@ const block_demographics_questions = {
   }
 };
 
-// ---------------- PAGE 9 ---------------- //
+// ---------------- PAGE 10 ---------------- //
 // ATTENTION CHECK
 const block_attention = {
   type: jsPsychWyLabSurvey,
@@ -827,7 +841,7 @@ const block_attention = {
   }
 };
   
-// ---------------- PAGE 10 ---------------- //
+// ---------------- PAGE 11 ---------------- //
 // DEBRIEFING
 const block_debrief = {
   type: jsPsychWyLabSurvey,
@@ -866,7 +880,7 @@ const block_debrief = {
     </section>`
 };
 
-// ---------------- PAGE 11 ---------------- //
+// ---------------- PAGE 12 ---------------- //
 // COMMENTS AND FEEDBACK
 const block_feedback = {
   type: jsPsychWyLabSurvey,
@@ -941,7 +955,9 @@ const survey_flow = {
   timeline: [
     block_instructions, 
     block_pre_task,
+    block_begin_task,
     block_approach_avoid,
+    block_end_task,
     block_post_task,
     block_fiction_question,
     block_demographics_questions, 
