@@ -658,7 +658,7 @@ const block_post_task = {
 // ---------------- PAGE 7 ---------------- //
 const block_end_task = {
   type: jsPsychWyLabSurvey,
-  preamble: 'Great work! The next set of questions is about you. Please read each carefully and answer honestly.',
+  preamble: 'Great work! The next set of questions is about you.<br>Please read each carefully and answer honestly.',
   button_label: 'Begin Task',
 }
 
@@ -764,22 +764,22 @@ const block_demographics_questions = {
         options: [
           "White",
           "African or African-American",
-          "Hispanic/Latine",
+          "Hispanic or Latino/x/e",
           "Asian or Asian-American",
           "Indigenous American or Alaskan Native",
           "Native Hawaiian or other Pacific Islander",
-          "Other:", 
+          "Other:",
           "Prefer not to disclose"
         ],
         write_in: ["Other:"],
         values: [
-          "White", 
-          "African/African-American", 
-          "Hispanic/Latine", 
-          "Asian/Asian-American", 
-          "Indigenous/Alaskan Native", 
-          "Native Hawaiian/Pacific Islander", 
-          "Other", 
+          "White",
+          "African/African-American",
+          "Hispanic/Latine",
+          "Asian/Asian-American",
+          "Indigenous/Alaskan Native",
+          "Native Hawaiian/Pacific Islander",
+          "Other",
           "Prefer not to disclose"
         ]
       },
@@ -830,7 +830,7 @@ const block_attention = {
         options: ["1<br>Not at all", "2", "3", "4", "5", "6", "7<br>Completely"],
         values: [1, 2, 3, 4, 5, 6, 7]
       },
-      requirements: { type: 'request' }
+      requirements: { type: 'required' }
     },
   ],
   button_label: 'Next Page',
