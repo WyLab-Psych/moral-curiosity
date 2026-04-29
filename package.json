@@ -19,6 +19,7 @@
     "@jspsych-contrib/plugin-pipe": "^0.5.0",
     "@jspsych/plugin-browser-check": "^2.1.0",
     "@jspsych/plugin-fullscreen": "^2.1.0",
+    "@jspsych/plugin-html-keyboard-response": "^2.1.0",
     "jquery": "^3.7.1",
     "jspsych": "^8.2.2"
   }

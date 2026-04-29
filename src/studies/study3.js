@@ -18,6 +18,7 @@ import jsPsychWyLabSurvey from '../plugins/plugin-wylab-survey';
 
 // Import officially contributed jsPsych plugins
 import jsPsychPipe from '@jspsych-contrib/plugin-pipe';
+import jsPsychHtmlKeyboardResponse from '@jspsych/plugin-html-keyboard-response';
 
 dom.watch();
 
@@ -65,13 +66,13 @@ const task_stimuli_names = task_stimuli.map(s => s.name);
 
 // Motives + Motive Labels
 const motives = jsPsych.randomization.shuffle([
-  { id: 'certainty', text: "...fill in gaps in my knowledge about people like this." },
-  { id: 'cognitive_mental', text: "...help me understand what is going on in the minds of people like this." },
-  { id: 'cognitive_context', text: "...help me understand the life experiences that lead people to become like this." },
-  { id: 'instrumental', text: "...be useful or helpful to me." },
-  { id: 'hedonic_affect', text: "...make me feel." },
-  { id: 'hedonic_fun', text: "...be fun or interesting to learn about." },
-  { id: 'social', text: "...help me understand how I relate or compare to people like this." }
+  { id: 'instrumental', text: "...be practically relevant or useful to me." },
+  { id: 'mental_states', text: "...help me understand what is going on in the minds of people like this." },
+  { id: 'cognitive_model', text: "...help me understand the fundamental nature of good and evil." },
+  { id: 'background_story', text: "...help me understand the life experiences that lead people to become like this." },
+  { id: 'hedonic_affect', text: "...make me feel good or bad." },
+  { id: 'hedonic_fun', text: "...be fun or entertaining to learn about." },
+  { id: 'similarity_distinctiveness', text: "...help me understand how I relate or compare to people like this." }
 ]);
 
 // Extract Motives and Motive Labels
@@ -345,7 +346,10 @@ const study_instructions = [
   `<p class="align-left" style="margin-bottom: 1em;">
     On each trial, you will read a brief description of someone and then answer questions about what you think and feel about that information. 
     Some of the text is intentionally blurred out to start, and you will be asked whether you would like to <strong>reveal more information or skip seeing more information.</strong> 
-    The task will take approximately the same amount of time regardless of if you skip or show the information.
+  </p>
+  <p class="align-left">
+    If you choose to reveal more information, you will need to <strong>wait 15 seconds</strong> for the information to load. However,
+    if you choose to skip the information, you will immediately advance.
   </p>
   <p class="align-left">
     Please note that some descriptions include potentially disturbing content, including violence, sexual assault, or other sensitive topics.
@@ -358,7 +362,7 @@ const study_instructions = [
 
   // 4. Study Design
   `<p class="align-left">
-    You will be asked to answer questions about a total of <strong>10 people.</strong> Please read each description carefully, and answer as honestly as possible.
+    You will be asked to answer questions about a total of <strong>30 people.</strong> Please read each description carefully, and answer as honestly as possible.
   </p>`,
 
   // 5. Pre-/Post-Questions
@@ -466,6 +470,7 @@ let norming_trial_count = 0;
 const block_approach_avoid = {
   timeline: task_stimuli.map(stimulus => {
     let trial_decision = null;
+    let chosen_motive = null;
     let prompt_initial = `
       <section>
         <div class="norming-card aat-card active norming-card-${stimulus.morality === "moral" ? moral_color : immoral_color}">
@@ -488,8 +493,8 @@ const block_approach_avoid = {
           const page2_html = `
             <section>
               <p>
-                Based on what you can read about this person, how much do each of <strong>the following</strong> 
-                factor into your decision about whether or not you would like to 
+                Based on what you can read about this person, if you had to pick <strong>one</strong> 
+                of the options below, which <strong>best explains</strong> your decision about whether or not you would like to 
                 <strong>show or skip</strong> more information about this person?
               </p>
               <p style="font-size: 18pt;">How the information would:</p>
@@ -497,15 +502,17 @@ const block_approach_avoid = {
           return page2_html;
         },
         question_parameters: { 
-          type: 'matrix',
-          names: motives_names,
-          options: motives_text,
-          labels: ["<span style='font-size: 10pt;'>Not at all</span><br>1", "2", "3", "4", "5", "6", "<span style='font-size: 10pt;'>A great deal</span><br>7"],
-          values: [1, 2, 3, 4, 5, 6, 7]
+          type: 'radio',
+          mc_orientation: 'vertical',
+          options: motives.map(m => m.text),
+          values: motives.map(m => m.id)
         },
-        requirements: { type: 'request' }
+        requirements: { type: 'required' }
       }],
       on_finish(data) {
+        // Record chosen motive
+        chosen_motive = motives.find(m => m.id === data.response['pre_trial_motive']).text || null;
+
         // Record stimulus information
         data.stimulus_name = stimulus.name;
         data.stimulus_morality = stimulus.morality;
@@ -522,6 +529,36 @@ const block_approach_avoid = {
     };
 
     const page2 = {
+      type: jsPsychWyLabSurvey,
+      preamble: prompt_initial,
+      questions: [{
+        // Approach/Avoidance Motives
+        name: "motive_strength",
+        prompt() {
+          const page2_html = `
+            <section>
+              <p>
+                You indicated that your decision is best explained by:<br>
+                How the information would <strong>${chosen_motive.slice(3)}</strong><br><br>
+              </p>
+              <p style="font-size: 18pt;">How <strong>strongly</strong> do you feel this motive explains your decision?</p>
+            </section>`;
+          return page2_html;
+        },
+        question_parameters: { 
+          type: 'radio',
+          mc_orientation: 'horizontal', 
+          options: ["1<br>Not at all", "2", "3", "4", "5", "6", "7<br>Completely"],
+          values: [1, 2, 3, 4, 5, 6, 7]
+        },
+        requirements: { type: 'request' }
+      }],
+      on_finish(data) {
+        data.motive_strength = data.response['motive_strength'] || null;
+      }
+    };
+
+    const page3 = {
       type: jsPsychWyLabSurvey,
       preamble: prompt_initial,
       questions: [{
@@ -542,7 +579,29 @@ const block_approach_avoid = {
       }
     };
 
-    const page3 = {
+    const loading_page = {
+      timeline: [{
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+          <div class="loading-container">
+            <div class="loader"></div>
+            <p>Loading information, please be patient...</p>
+          </div>`,
+        choices: "NO_KEYS",
+        trial_duration: 15000,
+      }],
+      // This is the critical part: 
+      // It checks the decision made in page3 right before starting this sub-timeline
+      conditional_function: function() {
+        if (trial_decision === "Show") {
+          return true;  // Run the loader
+        } else {
+          return false; // Skip the loader
+        }
+      }
+    };
+
+    const page4 = {
       type: jsPsychWyLabSurvey,
       preamble: function() {
         const isShow = (trial_decision === "Show");
@@ -604,7 +663,7 @@ const block_approach_avoid = {
         data.trial_number = norming_trial_count;
       }
     };
-    return { timeline: [page1, page2, page3] };
+    return { timeline: [page1, page2, page3, loading_page, page4] };
   })
 };
 
@@ -955,9 +1014,9 @@ const block_redirect = {
 // Survey Flow
 const survey_flow = {
   timeline: [
-    block_instructions, 
-    block_pre_task,
-    block_begin_task,
+    // block_instructions, 
+    // block_pre_task,
+    // block_begin_task,
     block_approach_avoid,
     block_end_task,
     block_post_task,
@@ -994,7 +1053,11 @@ const block_no_consent_exit = {
 };
 
 // Push to timeline in order
-timeline.push([block_browser_check, block_enter_fullscreen, block_captcha, block_botcheck, block_consent_form, survey_flow, block_no_consent_exit]);
+timeline.push([
+  // block_browser_check, block_enter_fullscreen, block_captcha, block_botcheck, 
+  block_consent_form, 
+  survey_flow, 
+  block_no_consent_exit]);
 
 // Function to initialize the experiment
 function startExperiment() { jsPsych.run(timeline); };
