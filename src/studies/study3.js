@@ -588,7 +588,7 @@ const block_approach_avoid = {
             <p>Loading information, please be patient...</p>
           </div>`,
         choices: "NO_KEYS",
-        trial_duration: 15000,
+        trial_duration: 5000,
       }],
       // This is the critical part: 
       // It checks the decision made in page3 right before starting this sub-timeline
