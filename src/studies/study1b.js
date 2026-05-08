@@ -1,4 +1,4 @@
-import stimuli from '../stimuli/study2-targets.json' with { type: 'json' }
+import stimuli from '../stimuli/norming-targets.json' with { type: 'json' }
 
 // Import FontAwesome icons
 import { library, dom } from '@fortawesome/fontawesome-svg-core'
@@ -53,31 +53,41 @@ const completion_time = 14;  // in minutes
 const pre_order = jsPsych.randomization.sampleWithoutReplacement(["worldview_first", "motives_first"], 1)[0];
 const task_order = jsPsych.randomization.sampleWithoutReplacement(["affect_first", "interest_first"], 1)[0];
 const post_order = pre_order;
-const approach_avoid_responses = jsPsych.randomization.shuffle(["Show", "Skip"]);
-const approach_avoid_order = `${approach_avoid_responses[0].toLowerCase()}_${approach_avoid_responses[1].toLowerCase()}`;
+// const approach_avoid_order = `${approach_avoid_responses[0].toLowerCase()}_${approach_avoid_responses[1].toLowerCase()}`;
 
-const moral_color = jsPsych.randomization.sampleWithoutReplacement(["blue", "red"], 1)[0];
-const immoral_color = (moral_color === "blue") ? "red" : "blue";
-const color_scheme = `moral_${moral_color}_immoral_${immoral_color}`;
 
 // Shuffled Stimuli
-const task_stimuli = jsPsych.randomization.shuffle(stimuli);
+const task_stimuli = jsPsych.randomization.shuffle(stimuli).slice(0, 30);
 const task_stimuli_names = task_stimuli.map(s => s.name);
 
-// Motives + Motive Labels
-const motives = jsPsych.randomization.shuffle([
-  { id: 'instrumental', text: "...be practically relevant or useful to me." },
-  { id: 'mental_states', text: "...help me understand what is going on in the minds of people like this." },
-  { id: 'cognitive_model', text: "...help me understand the fundamental nature of good and evil." },
-  { id: 'background_story', text: "...help me understand the life experiences that lead people to become like this." },
-  { id: 'hedonic_affect', text: "...make me feel good or bad." },
-  { id: 'hedonic_fun', text: "...be fun or entertaining to learn about." },
-  { id: 'similarity_distinctiveness', text: "...help me understand how I relate or compare to people like this." }
+// Moral Targets
+const moral_targets = jsPsych.randomization.shuffle([
+  {id: 'good', content: `<img src="src/stimuli/morally-good-target.svg" alt="Good">`},
+  {id: 'bad', content: `<img src="src/stimuli/morally-bad-target.svg" alt="Bad">`}
+]);
+
+// Motives + Motive Labels      
+const motives = jsPsych.randomization.shuffle(
+  [
+  { id: 'instrumental', label: "Learn Something Useful", text: "...be practically relevant or useful to me." },
+  { id: 'mental_states', label: "Get Inside Their Minds", text: "...help me understand what is going on in the minds of people like this." },
+  { id: 'cognitive_model', label: "Inform My Worldview", text: "...help me understand the fundamental nature of good and evil." },
+  { id: 'background_story', label: "Learn Their Background Story", text: "...help me understand the life experiences that lead people to become like this." },
+  { id: 'hedonic_affect', label: "Regulate My Emotions", text: "...make me feel good or bad." },
+  { id: 'hedonic_fun', label: "Fun&nbsp;&&nbsp;Entertainment", text: "...be fun or entertaining to learn about." },
+  { id: 'similarity_distinctiveness', label: "Compare and Contrast with Myself", text: "...help me understand how I relate or compare to people like this." }
 ]);
 
 // Extract Motives and Motive Labels
 const motives_text = motives.map(m => m.text);
 const motives_names = motives.map(m => m.id);
+
+console.log(motives_names)
+console.log(motives_text)
+
+// Shuffles Motives
+const trial_motives = jsPsych.randomization.shuffle(motives_names.flatMap(label => Array(3).fill(label)));
+
 
 jsPsych.data.addProperties({
   // Participant / Study / Session ID
@@ -85,16 +95,10 @@ jsPsych.data.addProperties({
   study_id: study_id,
   session_id: session_id,
 
-  // Pre-Task Questions Order (Worldview x ToM)
-  pre_post_dv_order: pre_order,
-
   // Task Randomization (Morality Color Scheme, Stimuli Order, Motives Order)
-  morality_color_order: color_scheme,
-  approach_avoid_order: approach_avoid_order,
-  stimuli_order: task_stimuli_names,
   motive_order: motives_names,
 
-  // Task Questions Order (Affect x Interest)
+  // Task Questions Order (Motives vs. Approach/Avoid Motivations)
   task_dv_order: task_order
 });
 
@@ -336,50 +340,21 @@ const block_consent_form = {
 // ---------------- PAGE 3 ---------------- //
 const study_instructions = [
   // 1. Introduction
-  `<p class="align-left" style="margin-bottom: 1em;">Welcome! Thank you for agreeing to participate 🙂</p>
+  `<p class="align-left" style="margin-bottom: 1em;">Welcome! Thank you for agreeing to participate 🙂</p>`,
   
-  <p class="align-left">
-    In this study, we are interested in understanding how you think and feel about some <strong>real people</strong> from history.
-  </p>`,
-
-  // 2. Task Overview
-  `<p class="align-left" style="margin-bottom: 1em;">
-    On each trial, you will read a brief description of someone and then answer questions about what you think and feel about that information. 
-    Some of the text is intentionally blurred out to start, and you will be asked whether you would like to <strong>reveal more information or skip seeing more information.</strong> 
-  </p>
-  <p class="align-left">
-    If you choose to reveal more information, you will need to <strong>wait 15 seconds</strong> for the information to load. However,
-    if you choose to skip the information, you will immediately advance.
-  </p>
-  <p class="align-left">
-    Please note that some descriptions include potentially disturbing content, including violence, sexual assault, or other sensitive topics.
-  </p>`,
-
-  // 3. Source Credibility
   `<p class="align-left">
-    We selected <strong>real but mostly unknown</strong> people for you to rate using information collected from a variety of sources.
+   In this study, we are interested in who you are curious to learn about. We will show you two people who have been rated on their morality by other participants. 
   </p>`,
 
-  // 4. Study Design
   `<p class="align-left">
-    You will be asked to answer questions about a total of <strong>30 people.</strong> Please read each description carefully, and answer as honestly as possible.
-  </p>`,
-
-  // 5. Pre-/Post-Questions
-  `<p class="align-left">
-    Before and after the main task, you will also be asked some questions about your general worldview and current feelings.
-  </p>`,
-
-  // 6. Advance
-  `<p class="align-left">
-    When you are ready to begin, please click the <strong style="color: #0B6ED0;">Next Page</strong> button to advance!
+  Your task is to select the one that makes you most curious for more information about them. You will only get one opportunity to select one person to learn about, so make sure you choose the one who is most interesting to you!
   </p>`
 ];
 
 // STUDY INSTRUCTIONS
 const page_instructions = {
   type: jsPsychWyLabSurvey,
-  preamble: jsPsych.timelineVariable('full_html'), 
+  preamble: jsPsych.timelineVariable('full_instructions'), 
   button_label: 'Next Page'
 };
 
@@ -397,7 +372,7 @@ const block_instructions = {
 
     // 3. Combine them: Greyed out stuff + current active stuff
     return {
-      full_html: `
+      full_instructions: `
         <main class="jspsych-survey-html-form-preamble jspsych-instructions">
           <h2>Study Instructions</h2>
             ${grayed_out_html}
@@ -409,320 +384,170 @@ const block_instructions = {
   })
 };
 
-// ---------------- PAGE 4 ---------------- //
-// PRE-TASK
-const block_pre_task = {
+let target_choice = null;
+// ---------------- PAGE 6+ ---------------- //
+const block_target_choice = {
   type: jsPsychWyLabSurvey,
-  preamble: 
-    `<p class="jspsych-survey-multi-choice-preamble">
-      Before you begin the main task, please respond to the following questions:
-    </p>`,
-  questions() {
-    const pre_worldview = {
-      name: 'pre_worldview',
-      prompt: "<p>Generally speaking, do you think that <strong>most people</strong> are morally good or morally bad?</p>",
+  questions: [
+    {
+      name: "target_choice",
+      prompt() {
+        return `
+          <style>
+            /* Hide the radio circles and the default Next button */
+            #next-btn, 
+            span.radio-button{ 
+              display: none !important; 
+            }
+
+            /* 1. Ensure the label is a flex container */
+            .jspsych-survey-html-form-radio-option-horizontal {
+              display: inline-flex !important;
+              align-items: center;      /* Vertical center */
+              justify-content: center;   /* Horizontal center */
+              padding: 20px !important;  /* Equal padding all around */
+              min-height: 120px;         /* Adjust as needed */
+            }
+
+
+            /* 3. If there is an image, make sure it doesn't have a baseline gap */
+            .jspsych-survey-html-form-radio-option-horizontal img {
+              display: block;
+            }
+
+          </style>
+          <section>
+            <p>Below are two examples of average moral ratings for people who have been rated by others.</p>
+            <p style="font-size: 18pt;">Of these two people, whose motives and background are you <strong>more curious</strong> to learn about?</p>
+          </section>`;
+      },
       question_parameters: { 
         type: 'radio',
-        mc_orientation: 'horizontal', 
-        options: ["1<br>Extremely morally bad", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely morally good"],
-        values: [1, 2, 3, 4, 5, 6, 7]
+        mc_orientation: 'horizontal',
+        options: moral_targets.map(t => t.content),
+        values: moral_targets.map(t => t.id),
+        mc_columns: false,
+        mc_num_columns: 2
       },
-      requirements: { type: 'request' }
-    };
-    const pre_motives = {
-      name: 'pre_motives',
-      prompt: "<p>Generally speaking, how well do you think you understand people's <strong>motives</strong> for behaving the way they do?</p>",
-      question_parameters: { 
-        type: 'radio', 
-        mc_orientation: 'horizontal', 
-        options: ["1<br>Not well at all", "2", "3", "4", "5", "6", "7<br>Extremely well"],
-        values: [1, 2, 3, 4, 5, 6, 7] 
-      },
-      requirements: { type: 'request' }
-    };
-    if (pre_order == "worldview_first") {
-      return [pre_worldview, pre_motives];
-    } else if (pre_order == "motives_first") {
-      return [pre_motives, pre_worldview];
-    };
-  },
-  button_label: 'Next Page',
-  on_finish(data) {
-    // Record pre-task responses
-    jsPsych.data.addProperties ({
-      pre_worldview: data.response['pre_worldview'] || null,
-      pre_motives: data.response['pre_motives'] || null
+      requirements: { type: 'required' }
+    }
+  ],
+  on_load() {
+    const options = document.querySelectorAll('.jspsych-survey-html-form-radio-option-horizontal');
+    options.forEach(opt => {
+      opt.addEventListener('click', () => {
+        // Use a slightly longer delay to ensure the radio selection is registered
+        setTimeout(() => {
+          const nextBtn = document.querySelector('#next-btn');
+          if (nextBtn) nextBtn.click();
+        }, 150);
+      }, { once: true }); // { once: true } ensures it can't be clicked twice
     });
+  },
+  on_finish(data) {
+    target_choice = data.response['target_choice'] || null;
   }
 };
-
-// ---------------- PAGE 5 ---------------- //
-const block_begin_task = {
+  
+const block_motives = {
   type: jsPsychWyLabSurvey,
-  preamble: 'Great! We will now begin the main task.',
-  button_label: 'Begin Task',
-}
-
-// ---------------- PAGE 6+ ---------------- //
-// NORMING TASK
-let norming_trial_count = 0;
+  preamble: function() {
+    const page3_html = `
+      <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px">
+        <span style="margin-bottom: 20px;">You selected to learn more about the minds and motives of this person:</span>
+        <img src="src/stimuli/morally-${target_choice}-target.svg" alt="Moral Target" style="max-width: 100%; height: auto;">
+      </section>`
+    return page3_html;
+  },
+  questions: [{
+    // Approach/Avoidance Motives
+    name: "pre_trial_motive",
+    prompt() {
+      const page2_html = `
+        <section>
+          <p>
+            How much do each of <strong>the following</strong> 
+            factor into your decision about whether or not you would like to 
+            <strong>show or skip</strong> more information about this person?
+          </p>
+          <p style="font-size: 18pt;">How the information would:</p>
+        </section>`;
+      return page2_html;
+    },
+    question_parameters: { 
+      type: 'matrix',
+      names: motives_names,
+      options: motives_text,
+      labels: ["<span style='font-size: 10pt;'>Not at all</span><br>1", "2", "3", "4", "5", "6", "<span style='font-size: 10pt;'>A great deal</span><br>7"],
+      values: [1, 2, 3, 4, 5, 6, 7]
+    },
+    requirements: { type: 'request' }
+  }],
+  on_finish(data) {
+    // Record motives responses
+    data.pre_trial_motive_certainty = data.response['pre_trial_motive_certainty'] || null;
+    data.pre_trial_motive_cognitive_mental = data.response['pre_trial_motive_cognitive_mental'] || null;
+    data.pre_trial_motive_cognitive_context = data.response['pre_trial_motive_cognitive_context'] || null;
+    data.pre_trial_motive_instrumental = data.response['pre_trial_motive_instrumental'] || null;
+    data.pre_trial_motive_hedonic_affect = data.response['pre_trial_motive_hedonic_affect'] || null;
+    data.pre_trial_motive_hedonic_fun = data.response['pre_trial_motive_hedonic_fun'] || null;
+    data.pre_trial_motive_social = data.response['pre_trial_motive_social'] || null;
+  }
+};
 
 const block_approach_avoid = {
-  timeline: task_stimuli.map(stimulus => {
-    let trial_decision = null;
-    let chosen_motive = null;
-    let prompt_initial = `
-      <section>
-        <div class="norming-card aat-card active norming-card-${stimulus.morality === "moral" ? moral_color : immoral_color}">
-          <h2>${stimulus.name}</h2>
-          <p>${stimulus.intro}</p>
-          <div class="faded-text">
-            <p>${stimulus.description}</p>
-            <p>${stimulus.motive}</p>
-          </div>
-        </div>
-      </section>`;
-
-    const page1 = {
-      type: jsPsychWyLabSurvey,
-      preamble: prompt_initial,
-      questions: [{
-        // Approach/Avoidance Motives
-        name: "pre_trial_motive",
-        prompt() {
-          const page2_html = `
-            <section>
-              <p>
-                Based on what you can read about this person, if you had to pick <strong>one</strong> 
-                of the options below, which <strong>best explains</strong> your decision about whether or not you would like to 
-                <strong>show or skip</strong> more information about this person?
-              </p>
-              <p style="font-size: 18pt;">How the information would:</p>
-            </section>`;
-          return page2_html;
-        },
-        question_parameters: { 
-          type: 'radio',
-          mc_orientation: 'vertical',
-          options: motives.map(m => m.text),
-          values: motives.map(m => m.id)
-        },
-        requirements: { type: 'required' }
-      }],
-      on_finish(data) {
-        // Record chosen motive
-        chosen_motive = motives.find(m => m.id === data.response['pre_trial_motive']).text || null;
-
-        // Record stimulus information
-        data.stimulus_name = stimulus.name;
-        data.stimulus_morality = stimulus.morality;
-
-        // Record motives responses
-        data.pre_trial_motive_certainty = data.response['pre_trial_motive_certainty'] || null;
-        data.pre_trial_motive_cognitive_mental = data.response['pre_trial_motive_cognitive_mental'] || null;
-        data.pre_trial_motive_cognitive_context = data.response['pre_trial_motive_cognitive_context'] || null;
-        data.pre_trial_motive_instrumental = data.response['pre_trial_motive_instrumental'] || null;
-        data.pre_trial_motive_hedonic_affect = data.response['pre_trial_motive_hedonic_affect'] || null;
-        data.pre_trial_motive_hedonic_fun = data.response['pre_trial_motive_hedonic_fun'] || null;
-        data.pre_trial_motive_social = data.response['pre_trial_motive_social'] || null;
-      }
-    };
-
-    const page2 = {
-      type: jsPsychWyLabSurvey,
-      preamble: prompt_initial,
-      questions: [{
-        // Approach/Avoidance Motives
-        name: "motive_strength",
-        prompt() {
-          const page2_html = `
-            <section>
-              <p>
-                You indicated that your decision is best explained by:<br>
-                How the information would <strong>${chosen_motive.slice(3)}</strong><br><br>
-              </p>
-              <p style="font-size: 18pt;">How <strong>strongly</strong> do you feel this motive explains your decision?</p>
-            </section>`;
-          return page2_html;
-        },
-        question_parameters: { 
-          type: 'radio',
-          mc_orientation: 'horizontal', 
-          options: ["1<br>Not at all", "2", "3", "4", "5", "6", "7<br>Completely"],
-          values: [1, 2, 3, 4, 5, 6, 7]
-        },
-        requirements: { type: 'request' }
-      }],
-      on_finish(data) {
-        data.motive_strength = data.response['motive_strength'] || null;
-      }
-    };
-
-    const page3 = {
-      type: jsPsychWyLabSurvey,
-      preamble: prompt_initial,
-      questions: [{
-        // Approach-Avoidance Decision
-        name: "trial_decision",
-        prompt: "<p style='font-size: 18pt;'>Would you like to reveal more information about this person?</p>",
-        question_parameters: { 
-          type: 'radio', 
-          mc_orientation: 'horizontal',
-          options: approach_avoid_responses,
-          values: approach_avoid_responses
-        },
-        requirements: { type: 'required' }
-      }],
-      on_finish(data) {
-        trial_decision = data.response['trial_decision'];
-        data.trial_decision = trial_decision === "Show" ? 1 : 0;
-      }
-    };
-
-    const loading_page = {
-      timeline: [{
-        type: jsPsychHtmlKeyboardResponse,
-        stimulus: `
-          <div class="loading-container">
-            <div class="loader"></div>
-            <p>Loading information, please be patient...</p>
-          </div>`,
-        choices: "NO_KEYS",
-        trial_duration: 5000,
-      }],
-      // This is the critical part: 
-      // It checks the decision made in page3 right before starting this sub-timeline
-      conditional_function: function() {
-        if (trial_decision === "Show") {
-          return true;  // Run the loader
-        } else {
-          return false; // Skip the loader
-        }
-      }
-    };
-
-    const page4 = {
-      type: jsPsychWyLabSurvey,
-      preamble: function() {
-        const isShow = (trial_decision === "Show");
-        const blur_switch = isShow ? "" : "faded-text";
-        const decision_text = isShow ? "You decided to <strong>show</strong> the full information about this person." : "You decided to <strong>skip</strong> the full information about this person. Please answer the following questions about the information you can see."
-
-        const page3_html = `
-          <section>
-            <div class="norming-card aat-card active norming-card-${stimulus.morality === "moral" ? moral_color : immoral_color}">
-              <h2>${stimulus.name}</h2>
-              <p>${stimulus.intro}</p>
-              <div class="${blur_switch}">
-                <p>${stimulus.description}</p>
-                <p>${stimulus.motive}</p>
-              </div>
-            </div>
-          </section>
-          <p style="font-size: 18pt;">${decision_text}</p>`;
-        return page3_html;
-      },
-      questions() {
-        // Information Affect
-        const task_affect = {
-          name: "post_trial_affect", 
-          prompt: "<p>How <strong>positively or negatively</strong> does this information make you feel?</p>",
-          question_parameters: { 
-            type: 'radio', 
-            mc_orientation: 'horizontal', 
-            options: ["1<br>Extremely negatively", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely positively"],
-            values: [1, 2, 3, 4, 5, 6, 7] 
-          },
-          requirements: { type: 'request' }
-        };
-        // Information Interest
-        const task_interest = {
-          name: "post_trial_interest", 
-          prompt: "<p>How <strong>interesting</strong> is this information?</p>",
-          question_parameters: { 
-            type: 'radio', 
-            mc_orientation: 'horizontal', 
-            options: ["1<br>Not at all interesting", "2", "3", "4", "5", "6", "7<br>Extremely interesting"], 
-            values: [1, 2, 3, 4, 5, 6, 7] 
-          },
-          requirements: { type: 'request' }
-        }
-        if (task_order == "affect_first") {
-          return [task_affect, task_interest];
-        } else if (task_order == "interest_first") {
-          return [task_interest, task_affect];
-        };
-      },
-      on_finish(data) {
-        // Record post-trial responses
-        data.post_trial_affect = data.response['post_trial_affect'] || null;
-        data.post_trial_interest = data.response['post_trial_interest'] || null;
-        
-        // Increment and assign trial number
-        norming_trial_count += 1;
-        data.trial_number = norming_trial_count;
-      }
-    };
-    return { timeline: [page1, page2, page3, loading_page, page4] };
-  })
-};
-
-// ---------------- PAGE 6 ---------------- //
-// POST-TASK
-const block_post_task = {
   type: jsPsychWyLabSurvey,
-  preamble: `
-    <p class="jspsych-survey-multi-choice-preamble">
-      Now that you have completed the main task, please respond to the following questions:
-    </p>`,
-  questions() {
-    // Post-Task Worldview
-    const post_worldview = {
-      name: 'post_worldview',
-      prompt: "<p>Generally speaking, do you think that <strong>most people</strong> are morally good or morally bad?</p>",
-      question_parameters: { 
-        type: 'radio', 
-        mc_orientation: 'horizontal', 
-        options: ["1<br>Extremely morally bad", "2", "3", "4<br>Neutral", "5", "6", "7<br>Extremely morally good"],
-        values: [1, 2, 3, 4, 5, 6, 7] 
-      },
-      requirements: { type: 'request' }
-    };
-    // Post-Task Motives
-    const post_motives = {
-      name: 'post_motives',
-      prompt: "<p>Generally speaking, how well do you think you understand people's <strong>motives</strong> for behaving the way they do?</p>",
-      question_parameters: { 
-        type: 'radio', 
-        mc_orientation: 'horizontal', 
-        options: ["1<br>Not well at all", "2", "3", "4", "5", "6", "7<br>Extremely well"],
-        values: [1, 2, 3, 4, 5, 6, 7] 
-      },
-      requirements: { type: 'request' }
-    };
-    if (post_order == "worldview_first") {
-      return [post_worldview, post_motives];
-    } else if (post_order == "motives_first") {
-      return [post_motives, post_worldview];
-    };
+  preamble: function() {
+    const page3_html = `
+      <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px">
+        <span style="margin-bottom: 20px;">You selected to learn more about the minds and motives of this person:</span>
+        <img src="src/stimuli/morally-${target_choice}-target.svg" alt="Moral Target" style="max-width: 100%; height: auto;">
+      </section>`
+    return page3_html;
   },
-  button_label: 'Next Page',
+  questions: [{
+    // Approach/Avoidance Motives
+    name: "approach_avoid",
+    prompt() {
+      const approach_avoid_html = `
+        <section>
+          <p>
+            How much is your decision explained by <strong>wanting to learn</strong> more information about this person versus <strong>not wanting to learn</strong> more information about the other person?
+          </p>
+        </section>`;
+      return approach_avoid_html;
+    },
+    question_parameters: { 
+      type: 'slider',
+      slider_direction: "bipolar",
+      slider_dynamic: true,
+      slider_color_scheme: "orange-purple",
+      slider_starting_value: 0,
+      slider_range: [-100, 100],
+      slider_step: 1,
+      slider_anchors: {
+        left: '<span id="left-pct">50%</span> avoiding the other person',
+        right: '<span id="right-pct">50%</span> learning about this person'
+      }
+    },
+    requirements: { type: 'request' }
+  }],
   on_finish(data) {
-    jsPsych.data.addProperties ({
-      post_worldview: data.response['post_worldview'] || null,
-      post_motives: data.response['post_motives'] || null
+    jsPsych.data.addProperties({
+      approach_avoid: data.response['approach_avoid'] || null
     });
   }
 };
 
-// ---------------- PAGE 7 ---------------- //
+
+// ---------------- PAGE ? ---------------- //
 const block_end_task = {
   type: jsPsychWyLabSurvey,
   preamble: 'Great work! The next set of questions is about you.<br>Please read each carefully and answer honestly.',
   button_label: 'Next Page',
 }
 
-// ---------------- PAGE 8 ---------------- //
+// ---------------- PAGE ? ---------------- //
 // FICTION CONSUMPTION
 const block_fiction_question = {
   type: jsPsychWyLabSurvey,
@@ -752,7 +577,7 @@ const block_fiction_question = {
   }
 };
 
-// ---------------- PAGE 9 ---------------- //
+// ---------------- PAGE ? ---------------- //
 // DEMOGRAPHICS
 const block_demographics_questions = {
   type: jsPsychWyLabSurvey,
@@ -871,7 +696,7 @@ const block_demographics_questions = {
   }
 };
 
-// ---------------- PAGE 10 ---------------- //
+// ---------------- PAGE ?? ---------------- //
 // ATTENTION CHECK
 const block_attention = {
   type: jsPsychWyLabSurvey,
@@ -901,7 +726,7 @@ const block_attention = {
   }
 };
   
-// ---------------- PAGE 11 ---------------- //
+// ---------------- PAGE ?? ---------------- //
 // DEBRIEFING
 const block_debrief = {
   type: jsPsychWyLabSurvey,
@@ -1017,9 +842,10 @@ const survey_flow = {
     // block_instructions, 
     // block_pre_task,
     // block_begin_task,
+    block_target_choice,
+    block_motives,
     block_approach_avoid,
     block_end_task,
-    block_post_task,
     block_fiction_question,
     block_demographics_questions, 
     block_attention,

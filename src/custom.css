@@ -490,6 +490,7 @@ blockquote {
 
 
 .faded-text {
+  user-select: none;  /* Prevent text selection */
   /* Apply a gradient mask to fade out the bottom */
   padding: 0 20px 0;
     -webkit-mask-image: linear-gradient(
@@ -591,6 +592,29 @@ input[type="number"] {
 }
 
 /* Multiple Choice Options */
+/* This handles the grid arrangement */
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols, 1), 1fr);
+  gap: 10px; /* Adjust spacing between buttons here */
+  align-items: start;
+}
+
+/* Ensure labels behave well inside the grid cells */
+.grid-layout label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 15px;
+}
+
+
+
+
+
+
+
+
 input[type="radio" i],
 input[type="checkbox" i] {
   align-self: center;

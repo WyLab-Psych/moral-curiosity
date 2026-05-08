@@ -118,10 +118,11 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
           const slider_range = slider.slider_range || [0, 100];
           const slider_step = slider.slider_step || 1;
           const slider_anchors = slider.slider_anchors || { left: "", right: "", center: "" };
+          const slider_dynamic = slider.slider_dynamic ? "slider-dynamic-value" : "";
 
           html += `
               <label class="jspsych-survey-html-form-prompt" for="slider-${question_id}">${question_prompt}</label>
-              <input id="slider-${question_id}" class="jspsych-slider" name="${question_name}" type="range"
+              <input id="slider-${question_id}" class="jspsych-slider ${slider_dynamic}" name="${question_name}" type="range"
                 value="${slider_starting_value}" data-starting-value="${slider_starting_value}" data-touched="false"
                 min="${slider_range[0]}" max="${slider_range[1]}" step="${slider_step}" 
                 onpointerdown="this.setAttribute('data-touched', 'true'); this.classList.add('${slider_direction}-clicked-${slider_color_scheme}');">
@@ -132,10 +133,22 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
               </div>`;
 
         } else if (question_type === "radio" || question_type === "checkbox") {
+
+          // Add a default column count if it's not provided (e.g., 2)
           const mc = question.question_parameters || {};
           const mc_orientation = mc.mc_orientation || 'vertical';
+          const mc_columns = mc.mc_columns || false; 
+          const mc_num_columns = mc.mc_num_columns || 1;
+
+
           html += `<p class="jspsych-survey-html-form-prompt">${question_prompt}</p>`;
-          html += `<div class="jspsych-survey-html-form-options-container-${mc_orientation}" role="${question_type}-group">`;
+          html += `<div class="jspsych-survey-html-form-options-container-${mc_orientation} ${mc_columns ? 'grid-layout' : ''}" 
+                        role="${question_type}-group"
+                        style="${mc_columns ? `
+                          display: grid; 
+                          grid-template-columns: repeat(${mc_num_columns}, 1fr);
+                          gap: 10px;
+                          align-items: start;` : ''}">`;
 
           for (let option_idx = 0; option_idx < mc.options.length; option_idx++) {
             const option_id = `${question_id}-opt-${option_idx}`;
@@ -360,9 +373,27 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
 
       // Slider/Write-in logic
       display_element.querySelectorAll('input[type="range"]').forEach(slider => {
-        slider.addEventListener('mousedown', () => {
+        slider.addEventListener('input', () => {
+          // 1. Existing logic to remove incomplete status
           slider.closest('fieldset')?.classList.remove('incomplete');
           slider.setAttribute('data-touched', 'true');
+
+
+          if (!slider.classList.contains('slider-dynamic-value')) return; // Skip if dynamic labels are disabled
+          // 2. NEW: Dynamic Label Logic
+          const val = parseInt((slider as HTMLInputElement).value);          
+
+          // Calculate percentages
+          // When val is 0, right is 50. When val is 100, right is 100.
+          // Equation: (val + 100) / 2
+          const rightPct = (val + 100) / 2;
+          const leftPct = 100 - rightPct;
+
+          const leftLabel = display_element.querySelector<HTMLElement>('#left-pct');
+          const rightLabel = display_element.querySelector<HTMLElement>('#right-pct');
+
+          if (leftLabel) leftLabel.innerText = `${Math.round(leftPct)}%`;
+          if (rightLabel) rightLabel.innerText = `${Math.round(rightPct)}%`;
         });
       });
 
@@ -442,14 +473,14 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      
+
       const requestIndices = questions.map((q, i) => q.requirements?.type === 'request' ? i : -1).filter(idx => idx !== -1);
       const incomplete = requestIndices.filter(idx => display_element.querySelector(`#jspsych-survey-question-${idx}`)?.classList.contains("incomplete"));
 
       if (incomplete.length > 0 && !forceSubmit) {
         (display_element.querySelector("#jspsych-survey-overlay") as HTMLElement).style.display = "block";
         (display_element.querySelector("#jspsych-confirm-popup") as HTMLElement).style.display = "block";
-        
+
         display_element.querySelector("#confirm-yes")?.addEventListener("click", () => {
           (display_element.querySelector("#jspsych-survey-overlay") as HTMLElement).style.display = "none";
           (display_element.querySelector("#jspsych-confirm-popup") as HTMLElement).style.display = "none";
@@ -459,7 +490,7 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
           forceSubmit = true;
           endTrial(); // Directly call the finish function
         }, { once: true });
-        
+
         return;
       }
 
@@ -481,10 +512,10 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
     function objectifyForm(arr: any[]) {
       const obj: any = {};
       arr.forEach(i => {
-        if (i.name in obj) { 
-          obj[i.name] = Array.isArray(obj[i.name]) ? [...obj[i.name], i.value] : [obj[i.name], i.value]; 
-        } else { 
-          obj[i.name] = i.value; 
+        if (i.name in obj) {
+          obj[i.name] = Array.isArray(obj[i.name]) ? [...obj[i.name], i.value] : [obj[i.name], i.value];
+        } else {
+          obj[i.name] = i.value;
         }
       });
       return obj;

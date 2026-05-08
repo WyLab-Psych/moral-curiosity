@@ -7,22 +7,6 @@ dom.watch();
 
 var jsPsychApproachAvoidTaskPlugin = (function() {
 
-  // --- STIMULUS DATA (External JSON import) ---
-  // const morallyBadStimuli = stimuli['bad']
-  // morallyBadStimuli = parsed.map(item => item.description);
-  // const morallyGoodStimuli = stimuli['good']
-  
-  
-  // const morallyGoodStimuli = stimuli.filter(item => item.morality === 'good').map(item => item.description);
-
-  // console.log(morallyBadStimuli)
-
-  // --- STIMULUS DATA (Internal to the plugin) ---
-  // const moralGood = [stimuli.good['']];
-  // console.log(moralGood)
-
-  // const moralBad = [stimuli.bad['Beverley Allitt']];
-
   // --- INFO OBJECT DEFINITION ---
   const info = {
     name: "plugin-jspsych-approach-avoid-task",
