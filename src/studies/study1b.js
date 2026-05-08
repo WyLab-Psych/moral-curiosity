@@ -54,10 +54,11 @@ const post_order = pre_order;
 // const approach_avoid_order = `${approach_avoid_responses[0].toLowerCase()}_${approach_avoid_responses[1].toLowerCase()}`;
 
 
+
 // Moral Targets
 const moral_targets = jsPsych.randomization.shuffle([
-  {id: 'good', content: `<img src="src/stimuli/morally-good-target.svg" alt="Good">`},
-  {id: 'bad', content: `<img src="src/stimuli/morally-bad-target.svg" alt="Bad">`}
+  {id: 'good', content: `<img src="/moral-curiosity/src/stimuli/morally-good-target.svg" alt="Good">`},
+  {id: 'bad', content: `<img src="/moral-curiosity/src/stimuli/morally-bad-target.svg" alt="Bad">`}
 ]);
 
 // Motives + Motive Labels      
