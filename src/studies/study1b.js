@@ -56,8 +56,8 @@ const post_order = pre_order;
 
 // Moral Targets
 const moral_targets = jsPsych.randomization.shuffle([
-  {id: 'good', content: `<img src="../src/stimuli/morally-good-target.svg" alt="Good">`},
-  {id: 'bad', content: `<img src="../src/stimuli/morally-bad-target.svg" alt="Bad">`}
+  {id: 'good', content: `<img src="src/stimuli/morally-good-target.svg" alt="Good">`},
+  {id: 'bad', content: `<img src="src/stimuli/morally-bad-target.svg" alt="Bad">`}
 ]);
 
 // Motives + Motive Labels      
