@@ -1,5 +1,3 @@
-import stimuli from '../stimuli/norming-targets.json' with { type: 'json' }
-
 // Import FontAwesome icons
 import { library, dom } from '@fortawesome/fontawesome-svg-core'
 import { faEnvelope, faPhone, faMousePointer, faArrowUpRightFromSquare, faCircleCheck, faCircleXmark, faChevronCircleRight, faChevronCircleDown, faArrowTurnUp, faArrowRight, faCircleArrowRight, faTriangleExclamation, faArrowRightToBracket, faStopwatch, faPuzzlePiece, faHeart, faStreetView, faLightbulb, faGamepad} from '@fortawesome/free-solid-svg-icons';
