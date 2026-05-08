@@ -54,10 +54,6 @@ const post_order = pre_order;
 // const approach_avoid_order = `${approach_avoid_responses[0].toLowerCase()}_${approach_avoid_responses[1].toLowerCase()}`;
 
 
-// Shuffled Stimuli
-const task_stimuli = jsPsych.randomization.shuffle(stimuli).slice(0, 30);
-const task_stimuli_names = task_stimuli.map(s => s.name);
-
 // Moral Targets
 const moral_targets = jsPsych.randomization.shuffle([
   {id: 'good', content: `<img src="src/stimuli/morally-good-target.svg" alt="Good">`},
