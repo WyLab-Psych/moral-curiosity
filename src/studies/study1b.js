@@ -496,7 +496,7 @@ const block_approach_avoid = {
     const page3_html = `
       <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px">
         <span style="margin-bottom: 20px;">You selected to learn more about the minds and motives of this person:</span>
-        <img src="src/stimuli/morally-${target_choice}-target.svg" alt="Moral Target" style="max-width: 100%; height: auto;">
+        <img src="stimuli/morally-${target_choice}-target.svg" alt="Moral Target" style="max-width: 100%; height: auto;">
       </section>`
     return page3_html;
   },
