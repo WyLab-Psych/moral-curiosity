@@ -1109,7 +1109,6 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   grid-column: 1;
   font-size: 10pt;
   text-align: left;
-  padding: 10px 0;
   align-self: center;
 }
 
@@ -1131,10 +1130,12 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
 
 /* Ensure the grid cell is a flex container */
 .grid-cell {
-    display: flex;
-    justify-content: center;
-    align-items: stretch; /* Allows the label to fill the height */
-    width: 100%;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: stretch; /* Allows the label to fill the height */
+  /* aspect-ratio: ; */
+  width: 100%;
 }
 
 /* Make the label the full-size clickable area */
@@ -1169,8 +1170,6 @@ label.jspsych-survey-html-form-checkbox-option-vertical.selected {
   top: 0;
   background-color: #ffffff; /* Or your page background color */
   z-index: 10; /* Increased to ensure it stays above all row elements */
-  padding-top: 10px; /* Provides "breathing room" so labels aren't cut off */
-  padding-bottom: 10px;
 }
 
 .matrix-header {

@@ -121,16 +121,24 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
           const slider_dynamic = slider.slider_dynamic ? "slider-dynamic-value" : "";
 
           html += `
-              <label class="jspsych-survey-html-form-prompt" for="slider-${question_id}">${question_prompt}</label>
-              <input id="slider-${question_id}" class="jspsych-slider ${slider_dynamic}" name="${question_name}" type="range"
-                value="${slider_starting_value}" data-starting-value="${slider_starting_value}" data-touched="false"
-                min="${slider_range[0]}" max="${slider_range[1]}" step="${slider_step}" 
-                onpointerdown="this.setAttribute('data-touched', 'true'); this.classList.add('${slider_direction}-clicked-${slider_color_scheme}');">
-              <div class="jspsych-slider-anchor-container">
-                <span class="jspsych-slider-left-anchor">${slider_anchors.left}</span>
-                <span class="jspsych-slider-center-anchor">${slider_anchors.center || ''}</span>
-                <span class="jspsych-slider-right-anchor">${slider_anchors.right}</span>
-              </div>`;
+            <label class="jspsych-survey-html-form-prompt" for="slider-${question_id}">${question_prompt}</label>
+            <input id="slider-${question_id}" 
+              class="jspsych-slider ${slider_dynamic}" 
+              name="${question_name}" 
+              type="range"
+              value="${slider_starting_value}" 
+              data-starting-value="${slider_starting_value}" 
+              data-touched="false"
+              data-direction="${slider_direction}"
+              data-color="${slider_color_scheme}"
+              min="${slider_range[0]}" 
+              max="${slider_range[1]}" 
+              step="${slider_step}">
+            <div class="jspsych-slider-anchor-container">
+              <span class="jspsych-slider-left-anchor">${slider_anchors.left}</span>
+              <span class="jspsych-slider-center-anchor">${slider_anchors.center || ''}</span>
+              <span class="jspsych-slider-right-anchor">${slider_anchors.right}</span>
+            </div>`;
 
         } else if (question_type === "radio" || question_type === "checkbox") {
 
@@ -373,27 +381,46 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
 
       // Slider/Write-in logic
       display_element.querySelectorAll('input[type="range"]').forEach(slider => {
-        slider.addEventListener('input', () => {
-          // 1. Existing logic to remove incomplete status
-          slider.closest('fieldset')?.classList.remove('incomplete');
-          slider.setAttribute('data-touched', 'true');
+        const s = slider as HTMLInputElement;
+        
+        // Create a reusable activation function
+        const activateSlider = () => {
+          s.closest('fieldset')?.classList.remove('incomplete');
+          s.setAttribute('data-touched', 'true');
+          s.dataset.touched = 'true';
+          
+          // Immediate color change
+          const direction = s.getAttribute('data-direction');
+          const color = s.getAttribute('data-color');
+          s.classList.add(`${direction}-clicked-${color}`);
+        };
 
+        // 1. Catch clicks/touches that don't necessarily move the thumb
+        ['mousedown', 'touchstart', 'click'].forEach(evt => {
+          s.addEventListener(evt, activateSlider);
+        });
 
-          if (!slider.classList.contains('slider-dynamic-value')) return; // Skip if dynamic labels are disabled
-          // 2. NEW: Dynamic Label Logic
-          const val = parseInt((slider as HTMLInputElement).value);          
+        // 2. Catch actual value changes
+        s.addEventListener('input', () => {
+          activateSlider();
 
-          // Calculate percentages
-          // When val is 0, right is 50. When val is 100, right is 100.
-          // Equation: (val + 100) / 2
-          const rightPct = (val + 100) / 2;
-          const leftPct = 100 - rightPct;
+          if (!s.classList.contains('slider-dynamic-value')) return;
 
-          const leftLabel = display_element.querySelector<HTMLElement>('#left-pct');
-          const rightLabel = display_element.querySelector<HTMLElement>('#right-pct');
+          // Wrap the UI update in an animation frame
+          window.requestAnimationFrame(() => {
+            const val = parseInt(s.value);
+            const min = parseInt(s.min);
+            const max = parseInt(s.max);
 
-          if (leftLabel) leftLabel.innerText = `${Math.round(leftPct)}%`;
-          if (rightLabel) rightLabel.innerText = `${Math.round(rightPct)}%`;
+            let rightPct = min < 0 ? (val + Math.abs(min)) / (max - min) * 100 : val;
+            let leftPct = 100 - rightPct;
+
+            const leftLabel = display_element.querySelector<HTMLElement>('#left-pct');
+            const rightLabel = display_element.querySelector<HTMLElement>('#right-pct');
+
+            if (leftLabel) leftLabel.innerText = `${Math.round(leftPct)}%`;
+            if (rightLabel) rightLabel.innerText = `${Math.round(rightPct)}%`;
+          });
         });
       });
 
