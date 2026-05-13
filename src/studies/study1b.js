@@ -38,11 +38,11 @@ var jsPsych = initJsPsych({
 const participant_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
 const study_id = jsPsych.data.getURLVariable('STUDY_ID');
 const session_id = jsPsych.data.getURLVariable('SESSION_ID');
-const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
-// const filename = jsPsych.randomization.randomID(10) + ".csv";
+// const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
+const filename = jsPsych.randomization.randomID(10) + ".csv";
 
 // Prolific Completion Code
-const prolific_completion_code = "C1DCBGN4";
+const prolific_completion_code = "CEYZDH93";
 
 // Study Completion Time
 const completion_time = 8;  // in minutes
@@ -60,19 +60,31 @@ const moral_targets = jsPsych.randomization.shuffle([
 const motives = jsPsych.randomization.shuffle(
   [
     // Cognitive Motives
-    { id: 'cognitive_mental', text: "...help me understand what is going on in the minds of people like this." },
-    { id: 'cognitive_model', text: "...help me understand the nature of good and evil." },
-    { id: 'cognitive_etiology', text: "...help me understand the life experiences that shape people into who they are." },
+    { id: 'mental_states', text: "help me understand what is going on in the minds of people like this." },
+    { id: 'cognitive_model', text: "help me understand the nature of good and evil." },
+    
+    // Contextual Motive
+    { id: 'etiology', text: "help me understand the life experiences that shape people into who they are." },
     
     // Hedonic Motives
-    { id: 'hedonic_affect', text: "...make me feel, emotionally." },
-    { id: 'hedonic_fun', text: "...be fun or entertaining to learn about." },
-    { id: 'hedonic_skepticism', text: "...allow me to come to my own conclusions about this person." },
+    { id: 'hedonic_affect', text: "make me feel, emotionally." },
+    { id: 'hedonic_fun', text: "be fun or entertaining to learn about." },
+    { id: 'meta_skepticism', text: "allow me to come to my own conclusions about this person." },
     
     // Social Motives  
-    { id: 'social_similarity', text: "...help me understand the ways in which this person shares similarities with me or the average person." },
-    { id: 'social_distinctiveness', text: "...help me understand the ways in which this person differs from me or the average person." },
-    { id: 'social_instrumental', text: "...be practically relevant or useful." }
+    { id: 'social_similarity', text: "help me understand how this person shares similarities with me." },
+    { id: 'social_distinctiveness', text: "help me understand how this person differs from me." },
+    { id: 'social_typicality', text: "help me understand how typical or normal this person is." },
+    { id: 'social_atypicality', text: "help me understand how atypical or abnormal this person is." },
+    
+    // Instrumental Motive
+    { id: 'instrumental', text: "be practically relevant or useful." }
+]);
+
+
+const mental_vs_behavioral = jsPsych.randomization.shuffle([
+  { id: 'mental', text: "Mental Information<br>(How they think)" },
+  { id: 'behavioral', text: "Behavioral Information<br>(What they do)" }
 ]);
 
 // Extract Motives and Motive Labels
@@ -92,11 +104,8 @@ jsPsych.data.addProperties({
   study_id: study_id,
   session_id: session_id,
 
-  // Task Randomization (Morality Color Scheme, Stimuli Order, Motives Order)
-  motive_order: motives_names,
-
-  // // Task Questions Order (Motives vs. Approach/Avoid Motivations)
-  // task_dv_order: task_order
+  // Task Randomization
+  motive_order: motives_names
 });
 
 // ---------------- PAGE 1 ---------------- //
@@ -337,14 +346,17 @@ const block_consent_form = {
 // ---------------- PAGE 3 ---------------- //
 const study_instructions = [
   // 1. Introduction
-  `<p class="align-left" style="margin-bottom: 1em;">Welcome! Thank you for agreeing to participate 🙂</p>`,
+  `<p class="align-left" style="margin-bottom: 1em;">
+    Welcome! Thank you for agreeing to participate 🙂
+  </p>`,
   
   `<p class="align-left">
-   In this study, we are interested in who you are curious to learn about. We will show you two people who have been rated on their morality by other participants. 
+    In this study, we are interested in understanding who you are curious about, and <u>why</u>.
   </p>`,
 
   `<p class="align-left">
-  Your task is to select the one that makes you most curious for more information about them. You will only get one opportunity to select one person to learn about, so make sure you choose the one who is most interesting to you!
+    We will show you two different people who have been rated on their morality by <u>other</u> participants.
+    You will then answer a series of questions about your motivations for learning more about each of these two people, separately.
   </p>`
 ];
 
@@ -384,67 +396,62 @@ const block_instructions = {
 
 
 
-
-
 let stimulus_label = null;
 let motive_trial_count = 0;
 const block_motives = {
-  timeline: stimulus_order.map(stimulus => {
-    let trial_decision = null;
-    if (stimulus === "good_first") {
-      stimulus_label = "good";
-    } else {
-      stimulus_label = "bad";
+  timeline: stimulus_order.map((stimulus, s_index) => {
+    const stimulus_label = (stimulus === "good_first") ? "good" : "bad";
+    const letter = (s_index === 0) ? "A" : "B";
+
+    // 1. Create the intro page for this specific person
+    const person_intro_page = {
+      type: jsPsychWyLabSurvey, // Using your custom plugin
+      preamble: `
+        <div style="text-align: center; margin-top: 20px;">
+          <h2>Person ${letter}</h2>
+          <p>On the following screens, you will answer a series of questions for this person shown below.</p>
+          <img src="stimuli/morally-${stimulus_label}-target.svg" style="width: 500px; margin: 20px 0px 20px;">
+        </div>
+      `
     };
 
-    let prompt_initial = `
-      <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px">
-        <span style="margin-bottom: 20px;">
-          Here is an example of an average moral rating for someone who has been rated by <u>others</u>.
-        </span>
-        <img src="stimuli/morally-${stimulus_label}-target.svg" alt="Moral Target" style="width: 500px; height: auto;">
-      </section>`
-
-    const page1 = {
-      type: jsPsychWyLabSurvey,
-      preamble: prompt_initial,
-      
-      questions: [{
-        // Approach/Avoidance Motives
-        name: "pre_trial_motive",
-        prompt() {
-          const page2_html = `
+    // 2. Create the array of motive trials
+    const motive_trials = motives_names.map((motive_name, m_index) => {
+      return {
+        type: jsPsychWyLabSurvey,
+        preamble: `
+          <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px">
+            <h2>Person ${letter}</h2>
+            <img src="stimuli/morally-${stimulus_label}-target.svg" alt="Moral Target" style="width: 400px; height: auto;">
+          </section>`,
+        questions: [{
+          name: motive_name,
+          prompt: `
             <section>
               <p style="margin-bottom: 20px; font-size: 18px;">
-                How much do each of the <strong>following considerations</strong> factor into your decision about whether or not you would like to <strong>learn more</strong> about this person?
+                How much does the following consideration factor into your decision about whether or not you would like to <strong>learn more</strong> about this person?
               </p>
-              <p style="font-size: 18pt;">How the information would:</p>
-            </section>`;
-          return page2_html;
-        },
-        question_parameters: { 
-          type: 'matrix',
-          names: motives_names,
-          options: motives_text,
-          labels: ["<span style='font-size: 10pt;'>Not at all</span><br>1", "2", "3", "4", "5", "6", "<span style='font-size: 10pt;'>Completely</span><br>7"],
-          values: [1, 2, 3, 4, 5, 6, 7]
-        },
-        requirements: { type: 'request' }
-      }],
-      on_finish(data) {
-        // Record motives responses
-        data.pre_trial_motive_certainty = data.response['pre_trial_motive_certainty'] || null;
-        data.pre_trial_motive_cognitive_mental = data.response['pre_trial_motive_cognitive_mental'] || null;
-        data.pre_trial_motive_cognitive_context = data.response['pre_trial_motive_cognitive_context'] || null;
-        data.pre_trial_motive_instrumental = data.response['pre_trial_motive_instrumental'] || null;
-        data.pre_trial_motive_hedonic_affect = data.response['pre_trial_motive_hedonic_affect'] || null;
-        data.pre_trial_motive_hedonic_fun = data.response['pre_trial_motive_hedonic_fun'] || null;
-        data.pre_trial_motive_social = data.response['pre_trial_motive_social'] || null;
+              <p style="font-size: 18pt;">"How the information would <strong>${motives_text[m_index]}</strong>"</p>
+            </section>`,
+          question_parameters: { 
+            type: 'radio',
+            mc_orientation: 'horizontal',
+            options: ["1<br>Not at all", "2", "3", "4", "5", "6", "7<br>Completely"],
+            values: [1, 2, 3, 4, 5, 6, 7]
+          },
+          requirements: { type: 'force' }
+        }],
+        on_finish: function(data) {
+          data.stimulus_condition = stimulus_label;
+          data.motive_type = motive_name;
+        }
+      };
+    });
 
-        motive_trial_count += 1;
-      }
+    // 3. Return the intro page FOLLOWED by the motive trials
+    return {
+      timeline: [person_intro_page, ...motive_trials]
     };
-    return { timeline: [page1] };
   })
 };
 
@@ -454,7 +461,7 @@ const block_approach_avoid = {
     const page3_html = `
       <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px">
         <span style="margin-bottom: 20px;">You selected to learn more about this person:</span>
-        <img src="stimuli/morally-${target_choice}-target.svg" alt="Moral Target" style="max-width: 100%; height: auto;">
+        <img src="stimuli/morally-${target_choice}-target.svg" alt="Moral Target" style="width: 500px; height: auto;">
       </section>`
     return page3_html;
   },
@@ -476,7 +483,7 @@ const block_approach_avoid = {
       slider_dynamic: true,
       slider_color_scheme: "orange-purple",
       slider_starting_value: 0,
-      slider_range: [-100, 100],
+      slider_range: [-50, 50],
       slider_step: 1,
       slider_anchors: {
         left: '<span id="left-pct">50%</span> avoiding the other person',
@@ -493,6 +500,52 @@ const block_approach_avoid = {
 };
 
 
+// STUDY INSTRUCTIONS
+// ---------------- PAGE 3 ---------------- //
+const study_choice_instructions = [
+  // 1. Introduction
+  `<p class="align-left">
+    Great! You are almost done. We will now ask you to make a choice between the two people.
+  </p>`,
+  `<p class="align-left">
+    Your task is to select the one that makes you most curious for more information about them. You will only get one opportunity to select one person to learn about, so make sure you choose the one who is most interesting to you!
+  </p>`,
+];
+
+// STUDY INSTRUCTIONS
+const page_choice_instructions = {
+  type: jsPsychWyLabSurvey,
+  preamble: jsPsych.timelineVariable('full_instructions2'), 
+  button_label: 'Next Page'
+};
+
+const block_choice_instructions = {
+  timeline: [page_choice_instructions],
+  timeline_variables: study_choice_instructions.map((current_content, index) => {
+    
+    // 1. Retrieve all previous instructions
+    const previous_content = study_choice_instructions.slice(0, index);
+    
+    // 2. Wrap previous instructions in the greyed-out class
+    const grayed_out_html = previous_content
+      .map(html => `<section class="jspsych-instructions-greyed-out">${html}</section>`)
+      .join('');
+
+    // 3. Combine them: Greyed out stuff + current active stuff
+    return {
+      full_instructions2: `
+        <main class="jspsych-survey-html-form-preamble jspsych-instructions">
+          <h2>Study Instructions</h2>
+            ${grayed_out_html}
+          <section class="jspsych-instructions-active">
+            ${current_content}
+          </section>
+        </main>`
+    };
+  })
+};
+
+
 // ATTENTION CHECK
 const block_mind_behavior = {
   type: jsPsychWyLabSurvey,
@@ -500,7 +553,7 @@ const block_mind_behavior = {
     const page3_html = `
       <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px">
         <span style="margin-bottom: 20px;">You selected to learn more about this person:</span>
-        <img src="stimuli/morally-${target_choice}-target.svg" alt="Moral Target" style="max-width: 100%; height: auto;">
+        <img src="stimuli/morally-${target_choice}-target.svg" alt="Moral Target" style="width: 500px; height: auto;">
       </section>`
     return page3_html;
   },
@@ -510,15 +563,15 @@ const block_mind_behavior = {
       name: 'mental_behavior',
       prompt: `
       <section>
-          <p>
-        Are you more interested in learning about this person's <strong>motives and background</strong> or their <strong>behavior</strong>?
+        <p>
+        What kind of information are you more interested in learning about this person?
         </p>
       </section>`,
       question_parameters: {
         type: 'radio',
         mc_orientation: 'horizontal',
-        options: ["Motives and Background", "Behavior"],
-        values: [1, 2]
+        options: mental_vs_behavioral.map(m => m.text),
+        values: mental_vs_behavioral.map(m => m.id)
       },
       requirements: { type: 'request' }
     },
@@ -864,7 +917,7 @@ const block_exit_fullscreen = {
 const block_save_data = {
   type: jsPsychPipe,
   action: "save",
-  experiment_id: "lgb8FqT4eANO",
+  experiment_id: "4xPtO3cxEzSA",
   filename: filename,
   data_string: () => jsPsych.data.get().csv()
 };
@@ -899,10 +952,9 @@ const block_redirect = {
 // Survey Flow
 const survey_flow = {
   timeline: [
-    // block_instructions, 
-    // block_pre_task,
-    // block_begin_task,
+    block_instructions, 
     block_motives,
+    block_choice_instructions,
     block_target_choice,
     block_approach_avoid,
     block_mind_behavior,
@@ -940,11 +992,14 @@ const block_no_consent_exit = {
 };
 
 // Push to timeline in order
-timeline.push([
-  // block_browser_check, block_enter_fullscreen, block_captcha, block_botcheck, 
-  block_consent_form, 
-  survey_flow, 
-  block_no_consent_exit]);
+timeline.push(
+  [
+    block_browser_check, block_enter_fullscreen, block_captcha, block_botcheck, 
+    block_consent_form, 
+    survey_flow, 
+    block_no_consent_exit
+  ]
+);
 
 // Function to initialize the experiment
 function startExperiment() { jsPsych.run(timeline); };
