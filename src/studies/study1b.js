@@ -420,8 +420,11 @@ const block_motives = {
             <h2>Person ${letter}</h2>
             <img src="stimuli/morally-${stimulus_label}-target.svg" alt="Moral Target" style="width: 500px; height: auto;">
         </section>
-        <p style="margin-bottom: 20px; font-size: 18px;">
+        <p style="font-size: 18px;">
           Think about the reasons why you might want to learn about this person. For each reason that follows below, indicate how much it influences your decision to <strong>learn more</strong> about this person.
+        </p>
+        <p style="margin-bottom: 20px; font-size: 18px;">
+          Please select "7 (Completely) only if it really, really influences your decision.
         </p>
       `
     };
@@ -981,7 +984,7 @@ const survey_flow = {
   ],
   conditional_function() {
     // Get the consent response from the previous trial
-    const last_trial_data = jsPsych.data.get().last(1).values()[0];
+    const last_trial_data = jsPsych.data.get().last(5).values()[0];
     return last_trial_data.consent_given; 
   }
 };
@@ -994,7 +997,7 @@ const block_no_consent_exit = {
     <p>Please close this window and <strong>return the submission on Prolific</strong> so your spot can be opened for others.</p>`,
   choices: [],
   conditional_function() {
-    const last_trial_data = jsPsych.data.get().last(1).values()[0];
+    const last_trial_data = jsPsych.data.get().last(5).values()[0];
     return !last_trial_data.consent_given;
   },
   on_load: function(){
