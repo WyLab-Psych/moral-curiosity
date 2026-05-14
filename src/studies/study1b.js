@@ -439,11 +439,12 @@ const block_motives = {
             options: ["1<br>Not at all", "2", "3", "4", "5", "6", "7<br>Completely"],
             values: [1, 2, 3, 4, 5, 6, 7]
           },
-          requirements: { type: 'force' }
+          requirements: { type: 'request' }
         }],
         on_finish: function(data) {
           data.stimulus_condition = stimulus_label;
           data.motive_type = motive_name;
+          data.motive_rating = data.response[motive_name] || null;
         }
       };
     });
@@ -508,7 +509,7 @@ const study_choice_instructions = [
     Great! You are almost done. We will now ask you to make a choice between the two people.
   </p>`,
   `<p class="align-left">
-    Your task is to select the one that makes you most curious for more information about them. You will only get one opportunity to select one person to learn about, so make sure you choose the one who is most interesting to you!
+    Your task is to select the one that makes you <strong>most curious</strong> for more information about them. You will only get one opportunity to select one person to learn about, so make sure you choose the one who is most interesting to you!
   </p>`,
 ];
 
