@@ -406,9 +406,9 @@ const block_motives = {
       type: jsPsychWyLabSurvey, // Using your custom plugin
       preamble: `
         <div style="text-align: center; margin-top: 20px;">
-        <p>On the following new pages, you will answer a series of questions for this person shown below.</p>
-          <h2>Person ${letter}</h2>
-          <img src="stimuli/morally-${stimulus_label}-target.svg" style="width: 500px; margin: 0px 0px 20px;">
+        <h2>Person ${letter}</h2>
+        <img src="stimuli/morally-${stimulus_label}-target.svg" style="width: 500px; margin: 0px 0px 20px;">
+          <p style="margin-bottom: 20px; font-size: 18px;">On the following new pages, you will answer a series of questions for this person shown below.</p>
         </div>
       `
     };
@@ -424,7 +424,7 @@ const block_motives = {
           Think about the reasons why you might want to learn about this person. For each reason that follows below, indicate how much it influences your decision to <strong>learn more</strong> about this person.
         </p>
         <p style="margin-bottom: 20px; font-size: 18px;">
-          Please select "7 (Completely) only if it really, really influences your decision.
+          Please select <strong>"7 (Completely)"</strong> only if it <u>really, really</u> influences your decision.
         </p>
       `
     };
