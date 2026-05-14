@@ -394,8 +394,6 @@ const block_instructions = {
 };
 
 
-
-
 let stimulus_label = null;
 let motive_trial_count = 0;
 const block_motives = {
@@ -408,10 +406,23 @@ const block_motives = {
       type: jsPsychWyLabSurvey, // Using your custom plugin
       preamble: `
         <div style="text-align: center; margin-top: 20px;">
+        <p>On the following new pages, you will answer a series of questions for this person shown below.</p>
           <h2>Person ${letter}</h2>
-          <p>On the following screens, you will answer a series of questions for this person shown below.</p>
-          <img src="stimuli/morally-${stimulus_label}-target.svg" style="width: 500px; margin: 20px 0px 20px;">
+          <img src="stimuli/morally-${stimulus_label}-target.svg" style="width: 500px; margin: 0px 0px 20px;">
         </div>
+      `
+    };
+
+    const person_intro_page2 = {
+      type: jsPsychWyLabSurvey, // Using your custom plugin
+      preamble: `
+        <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px">
+            <h2>Person ${letter}</h2>
+            <img src="stimuli/morally-${stimulus_label}-target.svg" alt="Moral Target" style="width: 500px; height: auto;">
+        </section>
+        <p style="margin-bottom: 20px; font-size: 18px;">
+          Think about the reasons why you might want to learn about this person. For each reason that follows below, indicate how much it influences your decision to <strong>learn more</strong> about this person.
+        </p>
       `
     };
 
@@ -422,16 +433,16 @@ const block_motives = {
         preamble: `
           <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px">
             <h2>Person ${letter}</h2>
-            <img src="stimuli/morally-${stimulus_label}-target.svg" alt="Moral Target" style="width: 400px; height: auto;">
+            <img src="stimuli/morally-${stimulus_label}-target.svg" alt="Moral Target" style="width: 500px; height: auto;">
           </section>`,
         questions: [{
           name: motive_name,
           prompt: `
             <section>
-              <p style="margin-bottom: 20px; font-size: 18px;">
-                How much does the following consideration factor into your decision about whether or not you would like to <strong>learn more</strong> about this person?
+              <p style="margin-bottom: 20px; font-size: 18px; opacity: 0.4; filter: grayscale(100%);">
+                Think about the reasons why you might want to learn about this person. For each reason that follows below, indicate how much it influences your decision to <strong>learn more</strong> about this person.
               </p>
-              <p style="font-size: 18pt;">"How the information would <strong>${motives_text[m_index]}</strong>"</p>
+              <p style="font-size: 18pt;"><u>Reason</u>: How the information would <strong>${motives_text[m_index]}</strong></p>
             </section>`,
           question_parameters: { 
             type: 'radio',
@@ -451,7 +462,7 @@ const block_motives = {
 
     // 3. Return the intro page FOLLOWED by the motive trials
     return {
-      timeline: [person_intro_page, ...motive_trials]
+      timeline: [person_intro_page, person_intro_page2, ...motive_trials]
     };
   })
 };
@@ -621,7 +632,6 @@ const block_fiction_question = {
     });
   }
 };
-
 
 
 let target_choice = null;
@@ -995,8 +1005,8 @@ const block_no_consent_exit = {
 // Push to timeline in order
 timeline.push(
   [
+    block_consent_form,
     block_browser_check, block_enter_fullscreen, block_captcha, block_botcheck, 
-    block_consent_form, 
     survey_flow, 
     block_no_consent_exit
   ]
