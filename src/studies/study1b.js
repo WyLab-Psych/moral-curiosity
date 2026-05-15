@@ -929,7 +929,12 @@ const block_save_data = {
   type: jsPsychPipe,
   action: "save",
   experiment_id: "4xPtO3cxEzSA",
-  filename: filename,
+  filename: function() {
+    const p_id = jsPsych.data.getURLVariable('PROLIFIC_PID') || "UNKNOWN_PID";
+    const s_id = jsPsych.data.getURLVariable('STUDY_ID') || "UNKNOWN_STUDY";
+    const sess_id = jsPsych.data.getURLVariable('SESSION_ID') || "UNKNOWN_SESSION";
+    return `${p_id}_${s_id}_${sess_id}.csv`;
+  },
   data_string: () => jsPsych.data.get().csv()
 };
 
