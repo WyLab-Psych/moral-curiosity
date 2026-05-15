@@ -38,8 +38,7 @@ var jsPsych = initJsPsych({
 const participant_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
 const study_id = jsPsych.data.getURLVariable('STUDY_ID');
 const session_id = jsPsych.data.getURLVariable('SESSION_ID');
-// const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
-const filename = jsPsych.randomization.randomID(10) + ".csv";
+const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
 
 // Prolific Completion Code
 const prolific_completion_code = "CEYZDH93";
@@ -399,22 +398,22 @@ const block_motives = {
 
     // 1. Create the intro page for this specific person
     const person_intro_page = {
-      type: jsPsychWyLabSurvey, // Using your custom plugin
+      type: jsPsychWyLabSurvey,
       preamble: `
-        <div style="text-align: center; margin-top: 20px;">
-        <p style="margin-bottom: 35px; font-size: 18px;">On the following new pages, you will answer a series of questions for this person shown below.</p>
-        <h2>Person ${stimulus_letter}</h2>
-        <img src="stimuli/morally-${stimulus_label}-target.svg" style="width: 400px; margin: 0px 0px 20px;">
+        <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px">
+          <p style="margin-bottom: 25px; font-size: 18px;">On the following new pages, you will answer a series of questions for this person shown below.</p>
+          <h2>Person ${stimulus_letter}</h2>
+          <img src="stimuli/morally-${stimulus_label}-target.svg" style="width: 400px; margin: 0px 0px 20px;">
         </div>`
     };
 
     const person_intro_page2 = {
-      type: jsPsychWyLabSurvey, // Using your custom plugin
+      type: jsPsychWyLabSurvey,
       preamble: `
-        <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 35px">
+        <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 20px">
           <h2>Person ${stimulus_letter}</h2>
           <img src="stimuli/morally-${stimulus_label}-target.svg" alt="Moral Target (${stimulus_label})" style="width: 400px; height: auto; margin-bottom: 25px;">
-          <p style="font-size: 18px;">
+          <p style="font-size: 18px; margin-top: 15px;">
             Think about the reasons why you might want to learn about this person. For each reason that follows below, indicate how much it influences your decision to <strong>learn more</strong> about this person.
           </p>
           <p style="margin-bottom: 20px; font-size: 18px;">
@@ -598,7 +597,7 @@ const block_approach_avoid = {
     prompt() {
       const approach_avoid_html = `
         <section>
-          <p>How much is your decision explained by <strong>wanting to learn</strong> more information about <u>this</u> person you selected versus <strong>not wanting to learn</strong> more information about <u>the other</u> person?</p>
+          <p>How much is your decision explained by <strong>wanting to learn</strong> more information about <u>this</u> person you selected versus <strong>avoiding</strong> more information about <u>the other</u> person?</p>
         </section>`;
       return approach_avoid_html;
     },
