@@ -35,9 +35,9 @@ var jsPsych = initJsPsych({
 });
 
 // Configure data saving
-const participant_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
-const study_id = jsPsych.data.getURLVariable('STUDY_ID');
-const session_id = jsPsych.data.getURLVariable('SESSION_ID');
+const participant_id = jsPsych.data.getURLVariable('PROLIFIC_PID') || null;
+const study_id = jsPsych.data.getURLVariable('STUDY_ID') || null;
+const session_id = jsPsych.data.getURLVariable('SESSION_ID') || null;
 const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
 
 // Prolific Completion Code
@@ -61,23 +61,22 @@ const motives = jsPsych.randomization.shuffle(
     // Cognitive Motives
     { id: 'mental_states', text: "help me understand what is going on in the minds of people like this." },
     { id: 'cognitive_model', text: "help me understand the nature of good and evil." },
+    { id: 'moral_model', text: "make me reflect on my moral values."},
     
     // Contextual Motive
     { id: 'etiology', text: "help me understand the life experiences that shape people into who they are." },
     
     // Hedonic Motives
-    { id: 'hedonic_affect', text: "make me feel, emotionally." },
-    { id: 'hedonic_fun', text: "be fun or entertaining to learn about." },
-    { id: 'meta_skepticism', text: "allow me to come to my own conclusions about this person." },
+    { id: 'emotional', text: "emotionally affect me." },
+    { id: 'fun', text: "be fun or entertaining to learn about." },
+    { id: 'skepticism', text: "allow me to come to my own conclusions about this person." },
     
     // Social Motives  
-    { id: 'social_similarity', text: "help me understand how this person shares similarities with me." },
-    { id: 'social_distinctiveness', text: "help me understand how this person differs from me." },
-    { id: 'social_typicality', text: "help me understand how typical or normal this person is." },
-    { id: 'social_atypicality', text: "help me understand how atypical or abnormal this person is." },
+    { id: 'similarity', text: "help me understand whether this person shares similarities with me." },
+    { id: 'atypicality', text: "help me understand how atypical or abnormal this person is." },
     
     // Instrumental Motive
-    { id: 'instrumental', text: "be practically relevant or useful." }
+    { id: 'instrumental', text: "be practically relevant or help me to prepare to interact with people like this." }
 ]);
 
 
@@ -592,34 +591,53 @@ const block_approach_avoid = {
     return page3_html;
   },
   questions: [{
-    // Approach/Avoidance Motives
-    name: "approach_avoid",
+    // Approach Motivation
+    name: "approach_motivation",
     prompt() {
       const approach_avoid_html = `
         <section>
-          <p>How much is your decision explained by <strong>wanting to learn</strong> more information about <u>this</u> person you selected versus <strong>avoiding</strong> more information about <u>the other</u> person?</p>
+          <p>How much is your decision explained by <strong>wanting to learn</strong> more information about <u>this</u> person you selected</p>
         </section>`;
       return approach_avoid_html;
     },
     question_parameters: { 
       type: 'slider',
-      slider_direction: "bipolar",
-      slider_dynamic: true,
-      slider_color_scheme: "orange-purple",
+      slider_direction: "unipolar",
+      slider_color_scheme: "purple",
       slider_starting_value: 0,
-      slider_range: [-50, 50],
+      slider_range: [0, 100],
       slider_step: 1,
       slider_anchors: {
-        left: '<span id="left-pct">50%</span> avoiding the other person',
-        right: '<span id="right-pct">50%</span> learning about this person'
+        left: 'Not at all',
+        right: 'Completely'
+      }
+    },
+    requirements: { type: 'request' }
+  },
+  {
+    // Avoidance Motivation
+    name: "avoid_motivation",
+    prompt: "How much is your decision explained by <strong>avoiding</strong> more information about <u>the other</u> person?",
+    question_parameters: {
+      type: 'slider',
+      slider_direction: "unipolar",
+      slider_color_scheme: "orange",
+      slider_starting_value: 0,
+      slider_range: [0, 100],
+      slider_step: 1,
+      slider_anchors: {
+        left: 'Not at all',
+        right: 'Completely'
       }
     },
     requirements: { type: 'request' }
   }],
+  randomization: { randomize_question_order: true },
+  button_label: 'Next Page',
   on_finish(data) {
     jsPsych.data.addProperties({
-      approach_motivation: 50 + parseInt(data.response['approach_avoid']) || null,
-      avoid_motivation: 50 - parseInt(data.response['approach_avoid']) || null
+      approach_motivation: data.response['approach_motivation'] || null,
+      avoid_motivation: data.response['avoid_motivation'] || null
     });
   }
 };
