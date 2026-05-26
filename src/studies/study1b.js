@@ -41,10 +41,10 @@ const session_id = jsPsych.data.getURLVariable('SESSION_ID') || null;
 const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
 
 // Prolific Completion Code
-const prolific_completion_code = "CEYZDH93";
+const prolific_completion_code = "C18B8EQ3";
 
 // Study Completion Time
-const completion_time = 5;  // in minutes
+const completion_time = 6;  // in minutes
 
 // Randomization for question orders, response options, and moral/immoral colors
 const stimulus_order = jsPsych.randomization.sampleWithoutReplacement(["bad_first", "good_first"]);
@@ -596,38 +596,20 @@ const block_approach_avoid = {
     prompt() {
       const approach_avoid_html = `
         <section>
-          <p>How much is your decision explained by <strong>wanting to learn</strong> more information about <u>this</u> person you selected</p>
+          <p>How much is your decision explained by <strong>wanting to learn</strong> more information about <u>this</u> person you selected versus <strong>avoiding</strong> more information about <u>the other</u> person?</p>
         </section>`;
       return approach_avoid_html;
     },
     question_parameters: { 
       type: 'slider',
-      slider_direction: "unipolar",
-      slider_color_scheme: "purple",
+      slider_direction: "bipolar",
+      slider_color_scheme: "orange-purple",
       slider_starting_value: 0,
-      slider_range: [0, 100],
+      slider_range: [-100, 100],
       slider_step: 1,
       slider_anchors: {
-        left: 'Not at all',
-        right: 'Completely'
-      }
-    },
-    requirements: { type: 'request' }
-  },
-  {
-    // Avoidance Motivation
-    name: "avoid_motivation",
-    prompt: "How much is your decision explained by <strong>avoiding</strong> more information about <u>the other</u> person?",
-    question_parameters: {
-      type: 'slider',
-      slider_direction: "unipolar",
-      slider_color_scheme: "orange",
-      slider_starting_value: 0,
-      slider_range: [0, 100],
-      slider_step: 1,
-      slider_anchors: {
-        left: 'Not at all',
-        right: 'Completely'
+        left: 'Avoiding the other person',
+        right: 'Learning about this person'
       }
     },
     requirements: { type: 'request' }
@@ -637,58 +619,20 @@ const block_approach_avoid = {
   on_finish(data) {
     jsPsych.data.addProperties({
       approach_motivation: data.response['approach_motivation'] || null,
-      avoid_motivation: data.response['avoid_motivation'] || null
+      avoid_motivation: 0 - parseInt(data.response['approach_motivation']) || null
     });
   }
 };
+
 
 // ---------------- PAGE 9 ---------------- //
-// MENTAL VS. BEHAVIORAL INFORMATION
-const block_mind_behavior = {
-  type: jsPsychWyLabSurvey,
-  preamble: function() {
-    const page3_html = `
-      <section style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 25px">
-        <span style="margin-bottom: 20px;">You selected to learn more about this person:</span>
-        <img src="stimuli/morally-${target_choice}-target.svg" alt="Moral Target (${target_choice})" style="width: 400px; height: auto;">
-      </section>`
-    return page3_html;
-  },
-  questions: [
-    {
-      // Mental vs. Behavioral Curiosity
-      name: 'mental_behavior',
-      prompt: `
-      <section>
-        <p>
-        What kind of information are you more interested in learning about this person?
-        </p>
-      </section>`,
-      question_parameters: {
-        type: 'radio',
-        mc_orientation: 'horizontal',
-        options: mental_vs_behavioral.map(m => m.text),
-        values: mental_vs_behavioral.map(m => m.id)
-      },
-      requirements: { type: 'request' }
-    },
-  ],
-  button_label: 'Next Page',
-  on_finish(data) {
-    jsPsych.data.addProperties({
-      mental_behavior: data.response['mental_behavior'] || null
-    });
-  }
-};
-
-// ---------------- PAGE 10 ---------------- //
 const block_end_task = {
   type: jsPsychWyLabSurvey,
   preamble: 'Great work! The next set of questions is about you.<br>Please read each carefully and answer honestly.',
   button_label: 'Next Page',
 }
 
-// ---------------- PAGE 11 ---------------- //
+// ---------------- PAGE 10 ---------------- //
 // FICTION CONSUMPTION
 const block_fiction_question = {
   type: jsPsychWyLabSurvey,
@@ -718,8 +662,7 @@ const block_fiction_question = {
   }
 };
 
-
-// ---------------- PAGE 12 ---------------- //
+// ---------------- PAGE 11 ---------------- //
 // DEMOGRAPHICS
 const block_demographics_questions = {
   type: jsPsychWyLabSurvey,
@@ -838,7 +781,7 @@ const block_demographics_questions = {
   }
 };
 
-// ---------------- PAGE 13 ---------------- //
+// ---------------- PAGE 11 ---------------- //
 // ATTENTION CHECK
 const block_attention = {
   type: jsPsychWyLabSurvey,
@@ -868,7 +811,7 @@ const block_attention = {
   }
 };
   
-// ---------------- PAGE 14 ---------------- //
+// ---------------- PAGE 13 ---------------- //
 // DEBRIEFING
 const block_debrief = {
   type: jsPsychWyLabSurvey,
@@ -907,7 +850,7 @@ const block_debrief = {
     </section>`
 };
 
-// ---------------- PAGE 15 ---------------- //
+// ---------------- PAGE 14 ---------------- //
 // COMMENTS AND FEEDBACK
 const block_feedback = {
   type: jsPsychWyLabSurvey,
@@ -946,7 +889,7 @@ const block_exit_fullscreen = {
 const block_save_data = {
   type: jsPsychPipe,
   action: "save",
-  experiment_id: "4xPtO3cxEzSA",
+  experiment_id: "AxWcbYjQDDV7",
   filename: function() {
     const p_id = jsPsych.data.getURLVariable('PROLIFIC_PID') || "UNKNOWN_PID";
     const s_id = jsPsych.data.getURLVariable('STUDY_ID') || "UNKNOWN_STUDY";
@@ -991,7 +934,6 @@ const survey_flow = {
     block_choice_instructions,
     block_target_choice,
     block_approach_avoid,
-    block_mind_behavior,
     block_end_task,
     block_fiction_question,
     block_demographics_questions, 
