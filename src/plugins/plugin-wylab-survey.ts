@@ -354,12 +354,22 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
               input.closest('label')?.classList.remove('selected');
               input.closest('.grid-cell')?.classList.remove('selected');
             });
-          };
-
-          if (target.checked) {
-            target.closest('label')?.classList.add('selected');
-            target.closest('.grid-cell')?.classList.add('selected');
-          };
+            
+            if (target.checked) {
+              target.closest('label')?.classList.add('selected');
+              target.closest('.grid-cell')?.classList.add('selected');
+            }
+          } 
+          // Handle checkbox styling dynamically based on checked state
+          else if (target.type === 'checkbox') {
+            if (target.checked) {
+              target.closest('label')?.classList.add('selected');
+              target.closest('.grid-cell')?.classList.add('selected');
+            } else {
+              target.closest('label')?.classList.remove('selected');
+              target.closest('.grid-cell')?.classList.remove('selected');
+            }
+          }
 
           // Validation completeness
           if (question_type === "matrix") {
@@ -367,7 +377,15 @@ class WyLabSurveyPlugin implements JsPsychPlugin<Info> {
             const answeredRows = Array.from(allRows).filter(row => row.querySelector('input:checked'));
             answeredRows.length === allRows.length ? fieldset.classList.remove('incomplete') : fieldset.classList.add('incomplete');
           } else {
-            fieldset.classList.remove('incomplete');
+            // Safely check the requirements type directly from the scoped question object
+            const isRequired = question.requirements?.type === 'required' || question.requirements?.type === 'comprehension';
+            const anyChecked = fieldset.querySelector('input:checked') !== null;
+            
+            if (anyChecked || !isRequired) {
+              fieldset.classList.remove('incomplete');
+            } else {
+              fieldset.classList.add('incomplete');
+            }
           };
         };
 

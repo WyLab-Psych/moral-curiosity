@@ -38,7 +38,8 @@ var jsPsych = initJsPsych({
 const participant_id = jsPsych.data.getURLVariable('PROLIFIC_PID') || null;
 const study_id = jsPsych.data.getURLVariable('STUDY_ID') || null;
 const session_id = jsPsych.data.getURLVariable('SESSION_ID') || null;
-const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
+// const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
+const filename = jsPsych.randomization.randomID(10) + ".csv";  // Random filename for anonymity
 
 // Prolific Completion Code
 const prolific_completion_code = "C18B8EQ3";
@@ -58,36 +59,41 @@ const moral_targets = jsPsych.randomization.shuffle([
 // Motives + Motive Labels      
 const motives = jsPsych.randomization.shuffle(
   [
-    // Cognitive Motives
-    { id: 'mental_states', text: "help me understand what is going on in the minds of people like this." },
-    { id: 'cognitive_model', text: "help me understand the nature of good and evil." },
-    { id: 'moral_model', text: "make me reflect on my moral values."},
-    
-    // Contextual Motive
-    { id: 'etiology', text: "help me understand the life experiences that shape people into who they are." },
-    
-    // Hedonic Motives
-    { id: 'emotional', text: "emotionally affect me." },
-    { id: 'fun', text: "be fun or entertaining to learn about." },
-    { id: 'skepticism', text: "allow me to come to my own conclusions about this person." },
-    
-    // Social Motives  
-    { id: 'similarity', text: "help me understand whether this person shares similarities with me." },
     { id: 'atypicality', text: "help me understand how atypical or abnormal this person is." },
-    
-    // Instrumental Motive
-    { id: 'instrumental', text: "be practically relevant or help me to prepare to interact with people like this." }
-]);
-
-
-const mental_vs_behavioral = jsPsych.randomization.shuffle([
-  { id: 'mental', text: "Mental Information<br>(How they think)" },
-  { id: 'behavioral', text: "Behavioral Information<br>(What they do)" }
+    { id: 'cognitive_model', text: "help me understand the nature of good and evil." },
+    { id: 'emotional', text: "emotionally affect me." },
+    { id: 'etiology', text: "help me understand the life experiences that shape people into who they are." },
+    { id: 'fun', text: "be fun to learn about." },
+    { id: 'instrumental', text: "be practically relevant or help me to prepare to interact with people like this." },
+    { id: 'mental_states', text: "help me understand what is going on in the minds of people like this." },
+    { id: 'moral_model', text: "make me reflect on my moral values."},
+    { id: 'similarity', text: "help me understand whether this person shares similarities with me." },
+    { id: 'skepticism', text: "allow me to come to my own conclusions about this person." }
 ]);
 
 // Extract Motives and Motive Labels
-const motives_text = motives.map(m => m.text);
 const motives_names = motives.map(m => m.id);
+const motives_text = motives.map(m => m.text);
+
+const simis = jsPsych.randomization.shuffle([
+  // Internalization
+  { id: 'i_1', item: "It would make me feel good to be a person who has these characteristics." },
+  { id: 'i_2', item: "Being someone who has these characteristics is an important part of who I am." },
+  { id: 'i_3', item: "I would be ashamed to be a person who had these characteristics." },
+  { id: 'i_4', item: "Having these characteristics is not really important to me." },
+  { id: 'i_5', item: "I strongly desire to have these characteristics." },
+
+  // Symbolization
+  { id: 's_1', item: "I often wear clothes that identify me as having these characteristics." },
+  { id: 's_2', item: "The types of things I do in my spare time (e.g., hobbies) clearly identify me as having these characteristics." },
+  { id: 's_3', item: "The kinds of books and magazines that I read identify me as having these characteristics." },
+  { id: 's_4', item: "The fact that I have these characteristics is communicated to others by my membership in certain organizations." },
+  { id: 's_5', item: "I am actively involved in activities that communicate to others that I have these characteristics." }
+]);
+
+// Extract SIMIS Items and SIMIS Labels
+const simis_names = simis.map(s => s.id);
+const simis_items = simis.map(s => s.item);
 
 
 jsPsych.data.addProperties({
@@ -97,7 +103,8 @@ jsPsych.data.addProperties({
   session_id: session_id,
 
   // Task Randomization
-  motive_order: motives_names
+  motive_order: motives_names,
+  simis_order: simis_names
 });
 
 // ---------------- PAGE 1 ---------------- //
@@ -157,7 +164,7 @@ const block_consent_form = {
       <section>
         <h3><i class="fa fa-2xs fa-chevron-circle-down"></i>&nbsp;<strong>Incentives for participation</strong></h3>
         <p class="indented align-left">
-          If participating through Prolific/Cloud, you will be paid <strong>$${(9 / 60 * completion_time).toFixed(2)} ($9.00/hour)</strong> for your participation in the study.
+          If participating through Prolific/Cloud, you will be paid <strong>$${(9.5 / 60 * completion_time).toFixed(2)} ($9.50/hour)</strong> for your participation in the study.
         </p>
       </section>
       
@@ -633,6 +640,57 @@ const block_end_task = {
 }
 
 // ---------------- PAGE 10 ---------------- //
+// SELF-IMPORTANCE OF MORAL IDENTITY (SIMIS)
+const block_simis = {
+  type: jsPsychWyLabSurvey,
+  preamble: `
+    <p class="jspsych-survey-multi-choice-preamble">
+      Listed below are some characteristics that might describe a person:
+    </p>
+    <p>
+      <strong>Caring, Compassionate, Fair, Friendly, Generous, Helpful, Hardworking, Honest, and Kind</strong>
+    </p>
+    <p>
+      The person with these characteristics could be you or it could be someone else. 
+      For a moment, visualize in your mind the kind of person who has these characteristics. 
+      Imagine how that person would think, feel, and act.
+    </p>
+    <p>
+      When you have a clear image of what this person would be like, answer the following questions:
+    </p>`,
+  questions: [
+    {
+      // SIMIS
+      name: 'simis',
+      prompt: "",
+      question_parameters: {
+        type: 'matrix',
+        names: simis_names,
+        options: simis_items,
+        labels: ["<span style='font-size: 10pt;'>Strongly disagree</span><br>1", "2", "3", "4", "5", "6", "<span style='font-size: 10pt;'>Strongly agree</span><br>7"],
+        values: [1, 2, 3, 4, 5, 6, 7]
+      },
+      requirements: { type: 'request' }
+    }
+  ],
+  button_label: 'Next Page',
+  on_finish(data) {
+    // Record motives responses
+    data.simis_i_1 = data.response['simis_i_1'] || null;
+    data.simis_i_2 = data.response['simis_i_2'] || null;
+    data.simis_i_3 = 8 - parseInt(data.response['simis_i_3']) || null;
+    data.simis_i_4 = 8 - parseInt(data.response['simis_i_4']) || null;
+    data.simis_i_5 = data.response['simis_i_5'] || null;
+    
+    data.simis_s_1 = data.response['simis_s_1'] || null;
+    data.simis_s_2 = data.response['simis_s_2'] || null;
+    data.simis_s_3 = data.response['simis_s_3'] || null;
+    data.simis_s_4 = data.response['simis_s_4'] || null;
+    data.simis_s_5 = data.response['simis_s_5'] || null;
+  }
+};
+
+// ---------------- PAGE 11 ---------------- //
 // FICTION CONSUMPTION
 const block_fiction_question = {
   type: jsPsychWyLabSurvey,
@@ -934,6 +992,7 @@ const survey_flow = {
     block_choice_instructions,
     block_target_choice,
     block_approach_avoid,
+    block_simis,
     block_end_task,
     block_fiction_question,
     block_demographics_questions, 
