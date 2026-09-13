@@ -38,8 +38,7 @@ var jsPsych = initJsPsych({
 const participant_id = jsPsych.data.getURLVariable('PROLIFIC_PID') || null;
 const study_id = jsPsych.data.getURLVariable('STUDY_ID') || null;
 const session_id = jsPsych.data.getURLVariable('SESSION_ID') || null;
-// const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
-const filename = jsPsych.randomization.randomID(10) + ".csv";  // Random filename for anonymity
+const filename = `${participant_id}` + "_" + `${study_id}` + "_" + `${session_id}.csv`;
 
 // Prolific Completion Code
 const prolific_completion_code = "C18B8EQ3";
