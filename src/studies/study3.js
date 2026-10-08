@@ -1,4 +1,4 @@
-import stimuli from '../stimuli/study2-targets.json' with { type: 'json' }
+import stimuli from '../stimuli/norming-targets.json' with { type: 'json' }
 
 // Import FontAwesome icons
 import { library, dom } from '@fortawesome/fontawesome-svg-core'
@@ -60,18 +60,23 @@ const immoral_color = (moral_color === "blue") ? "red" : "blue";
 const color_scheme = `moral_${moral_color}_immoral_${immoral_color}`;
 
 // Shuffled Stimuli
-const task_stimuli = jsPsych.randomization.shuffle(stimuli);
+const num_stimuli = 10; // Number of stimuli to use in the task
+const task_stimuli = jsPsych.randomization.shuffle(stimuli).slice(0, num_stimuli);
 const task_stimuli_names = task_stimuli.map(s => s.name);
 
 // Motives + Motive Labels
-const motives = jsPsych.randomization.shuffle([
-  { id: 'certainty', text: "...fill in gaps in my knowledge about people like this." },
-  { id: 'cognitive_mental', text: "...help me understand what is going on in the minds of people like this." },
-  { id: 'cognitive_context', text: "...help me understand the life experiences that lead people to become like this." },
-  { id: 'instrumental', text: "...be useful or helpful to me." },
-  { id: 'hedonic_affect', text: "...make me feel." },
-  { id: 'hedonic_fun', text: "...be fun or interesting to learn about." },
-  { id: 'social', text: "...help me understand how I relate or compare to people like this." }
+const motives = jsPsych.randomization.shuffle(
+  [
+    { id: 'atypicality', text: "help me understand how atypical or abnormal this person is." },
+    { id: 'cognitive_model', text: "help me understand the nature of good and evil." },
+    { id: 'emotional', text: "emotionally affect me." },
+    { id: 'etiology', text: "help me understand the life experiences that shape people into who they are." },
+    { id: 'fun', text: "be fun to learn about." },
+    { id: 'instrumental', text: "be practically relevant or help me to prepare to interact with people like this." },
+    { id: 'mental_states', text: "help me understand what is going on in the minds of people like this." },
+    { id: 'moral_model', text: "make me reflect on my moral values."},
+    { id: 'similarity', text: "help me understand whether this person shares similarities with me." },
+    { id: 'skepticism', text: "allow me to come to my own conclusions about this person." }
 ]);
 
 // Extract Motives and Motive Labels
@@ -955,9 +960,9 @@ const block_redirect = {
 // Survey Flow
 const survey_flow = {
   timeline: [
-    block_instructions, 
-    block_pre_task,
-    block_begin_task,
+    // block_instructions, 
+    // block_pre_task,
+    // block_begin_task,
     block_approach_avoid,
     block_end_task,
     block_post_task,
@@ -994,7 +999,10 @@ const block_no_consent_exit = {
 };
 
 // Push to timeline in order
-timeline.push([block_browser_check, block_enter_fullscreen, block_captcha, block_botcheck, block_consent_form, survey_flow, block_no_consent_exit]);
+timeline.push([
+  // block_browser_check, block_enter_fullscreen, block_captcha, block_botcheck, 
+  block_consent_form, 
+  survey_flow, block_no_consent_exit]);
 
 // Function to initialize the experiment
 function startExperiment() { jsPsych.run(timeline); };
